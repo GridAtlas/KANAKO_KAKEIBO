@@ -83,7 +83,6 @@ export function FixedCostForm({ initial, onSubmit, onCancel }: Props) {
           <input
             type="text"
             inputMode="numeric"
-            pattern="[0-9]*"
             value={amountStr === "" ? "" : formatYenNoSign(amount)}
             onChange={(e) => setAmountStr(e.target.value)}
             placeholder="0"
