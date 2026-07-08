@@ -20,9 +20,10 @@ export function BottomNav() {
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       aria-label="ボトムナビゲーション"
     >
-      <div className="mx-auto max-w-md flex items-center justify-around relative h-16">
+      <div className="mx-auto max-w-md grid grid-cols-[1fr_1fr_72px_1fr_1fr] items-center relative h-16">
         <NavItem tab={TABS[0]} active={pathname === "/"} />
         <NavItem tab={TABS[1]} active={pathname?.startsWith("/history") ?? false} />
+        <div aria-hidden="true" />
         {/* Center FAB */}
         <Link
           href="/add"
@@ -31,7 +32,7 @@ export function BottomNav() {
         >
           <Plus size={28} strokeWidth={2.5} />
         </Link>
-        <div className="w-14" />
+        <div aria-hidden="true" />
         <NavItem
           tab={TABS[2]}
           active={pathname?.startsWith("/settings") ?? false}
@@ -55,7 +56,7 @@ function NavItem({
   return (
     <Link
       href={tab.href}
-      className={`tap-target flex-1 flex flex-col items-center justify-center gap-0.5 text-[11px] ${
+      className={`tap-target flex flex-col items-center justify-center gap-0.5 text-[11px] ${
         active ? "text-pink-600" : "text-stone-500"
       }`}
     >

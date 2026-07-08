@@ -1,10 +1,12 @@
 import Image from "next/image";
 
+const assetBasePath = process.env.NODE_ENV === "production" ? "/KANAKO_KAKEIBO" : "";
+
 export function TitleHero() {
   return (
     <section className="-mx-3 -mt-3 relative h-[360px] overflow-hidden bg-pink-100">
       <Image
-        src="/images/kanako-title.jpg"
+        src={`${assetBasePath}/images/kanako-title.jpg`}
         alt="家計簿をつけるかなこのイラスト"
         fill
         priority
