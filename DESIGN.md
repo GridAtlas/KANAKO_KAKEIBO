@@ -171,7 +171,7 @@ function getMonthlyByCategory(monthKey: string) {
 
 ### Home タイトル / 分析セクション
 
-- Home 先頭に `TitleHero` を表示し、`public/images/kanako-title.jpg` を背景画像として使う。表示タイトルは「かなこの家計簿VER0.2」。
+- Home は `タイトル / 家計簿` のセグメントタブで切り替える。初期表示は `家計簿`、`タイトル` タブでは `TitleHero` を独立表示する。`TitleHero` は `public/images/kanako-title.jpg` を背景画像として使い、表示タイトルは「かなこの家計簿VER0.2」。
 - `MonthlyInsights` は `selectedMonth` を基準に直近 6 か月を `shiftMonthKey` で作り、`getMonthlyTotals(monthKey)` から収入 / 支出 / 収支を算出する。
 - 貯金率は `balance / income * 100`。収入が 0 の月は `--` 表示として、ゼロ除算しない。
 - 月次推移グラフは recharts の `BarChart`。ピンクを支出、グリーンを収入に固定し、データは localStorage 由来の store だけから読む。
