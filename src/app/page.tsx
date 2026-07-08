@@ -7,6 +7,8 @@ import { DashboardCards } from "@/components/DashboardCards";
 import { ExpensePieChart } from "@/components/ExpensePieChart";
 import { TransactionList } from "@/components/TransactionList";
 import { MonthSwitcher } from "@/components/MonthSwitcher";
+import { TitleHero } from "@/components/TitleHero";
+import { MonthlyInsights } from "@/components/MonthlyInsights";
 
 export default function HomePage() {
   const [hydrated, setHydrated] = useState(false);
@@ -36,12 +38,13 @@ export default function HomePage() {
 
   if (!hydrated) {
     return (
-      <div className="p-4 text-center text-sm text-slate-400">読み込み中…</div>
+      <div className="p-4 text-center text-sm text-stone-400">読み込み中…</div>
     );
   }
 
   return (
     <div className="flex-1 p-3 space-y-4">
+      <TitleHero />
       <MonthSwitcher />
       <DashboardCards
         totals={totals}
@@ -53,20 +56,21 @@ export default function HomePage() {
         <button
           type="button"
           onClick={() => applyFixedCostsForMonth(monthKey)}
-          className="tap-target w-full rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 py-3 font-semibold active:bg-amber-100"
+          className="tap-target w-full rounded-2xl bg-amber-50/90 border border-amber-200 text-amber-700 py-3 font-semibold shadow-sm active:bg-amber-100"
         >
           今月の固定費 {pendingFixedCosts} 件を計上する
         </button>
       )}
 
+      <MonthlyInsights />
       <ExpensePieChart data={byCategory} />
 
       <div>
         <div className="flex items-baseline justify-between px-1 mb-2">
-          <h2 className="font-semibold text-sm text-slate-600">直近の履歴</h2>
+          <h2 className="font-semibold text-sm text-stone-700">直近の履歴</h2>
           <Link
             href="/history"
-            className="text-xs text-emerald-600 font-semibold"
+            className="text-xs text-pink-600 font-semibold"
           >
             すべて見る →
           </Link>

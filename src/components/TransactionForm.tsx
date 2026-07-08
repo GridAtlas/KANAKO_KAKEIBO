@@ -37,7 +37,7 @@ export function TransactionForm() {
   return (
     <form onSubmit={handleSubmit} className="p-3 space-y-4 pb-32">
       {/* 支出 / 収入 タブ */}
-      <div className="flex bg-slate-100 rounded-lg p-1">
+      <div className="flex bg-pink-50 rounded-lg p-1">
         <button
           type="button"
           onClick={() => {
@@ -45,7 +45,7 @@ export function TransactionForm() {
             setCategoryId("");
           }}
           className={`tap-target flex-1 rounded-md py-2 font-semibold ${
-            type === "expense" ? "bg-white text-rose-600 shadow" : "text-slate-500"
+            type === "expense" ? "bg-white text-rose-600 shadow" : "text-stone-500"
           }`}
         >
           支出
@@ -59,7 +59,7 @@ export function TransactionForm() {
           className={`tap-target flex-1 rounded-md py-2 font-semibold ${
             type === "income"
               ? "bg-white text-emerald-600 shadow"
-              : "text-slate-500"
+              : "text-stone-500"
           }`}
         >
           収入
@@ -68,9 +68,9 @@ export function TransactionForm() {
 
       {/* 金額 */}
       <div>
-        <label className="block text-xs text-slate-500 mb-1">金額</label>
-        <div className="flex items-center rounded-xl bg-white border border-slate-200 px-4 py-3">
-          <span className="text-2xl font-bold text-slate-400 mr-2">¥</span>
+        <label className="block text-xs text-stone-500 mb-1">金額</label>
+        <div className="flex items-center rounded-xl bg-white/90 border border-pink-100 px-4 py-3">
+          <span className="text-2xl font-bold text-stone-400 mr-2">¥</span>
           <input
             type="text"
             inputMode="numeric"
@@ -84,7 +84,7 @@ export function TransactionForm() {
 
       {/* カテゴリ */}
       <div>
-        <label className="block text-xs text-slate-500 mb-2">カテゴリ</label>
+        <label className="block text-xs text-stone-500 mb-2">カテゴリ</label>
         <CategoryPicker
           selectedId={categoryId}
           onSelect={setCategoryId}
@@ -94,24 +94,24 @@ export function TransactionForm() {
 
       {/* 日付 */}
       <div>
-        <label className="block text-xs text-slate-500 mb-1">日付</label>
+        <label className="block text-xs text-stone-500 mb-1">日付</label>
         <input
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="w-full rounded-xl bg-white border border-slate-200 px-4 py-3 outline-none"
+          className="w-full rounded-xl bg-white/90 border border-pink-100 px-4 py-3 outline-none"
         />
       </div>
 
       {/* メモ */}
       <div>
-        <label className="block text-xs text-slate-500 mb-1">メモ（任意）</label>
+        <label className="block text-xs text-stone-500 mb-1">メモ（任意）</label>
         <input
           type="text"
           value={memo}
           onChange={(e) => setMemo(e.target.value)}
           placeholder="例: スーパー"
-          className="w-full rounded-xl bg-white border border-slate-200 px-4 py-3 outline-none"
+          className="w-full rounded-xl bg-white/90 border border-pink-100 px-4 py-3 outline-none"
         />
       </div>
 
@@ -119,7 +119,7 @@ export function TransactionForm() {
       <button
         type="button"
         disabled
-        className="tap-target w-full inline-flex items-center justify-center gap-2 rounded-xl bg-slate-100 text-slate-400 py-3 border border-dashed border-slate-300 cursor-not-allowed"
+        className="tap-target w-full inline-flex items-center justify-center gap-2 rounded-xl bg-pink-50 text-stone-400 py-3 border border-dashed border-pink-200 cursor-not-allowed"
       >
         <Camera size={18} />
         <span>レシートを撮る（近日対応 / Phase 3）</span>
@@ -131,7 +131,7 @@ export function TransactionForm() {
           <button
             type="submit"
             disabled={!canSubmit}
-            className="tap-target w-full inline-flex items-center justify-center rounded-2xl bg-emerald-600 text-white py-3 font-bold shadow-lg active:bg-emerald-700 disabled:opacity-40"
+            className="tap-target w-full inline-flex items-center justify-center rounded-2xl bg-pink-500 text-white py-3 font-bold shadow-lg active:bg-pink-600 disabled:opacity-40"
           >
             保存
           </button>

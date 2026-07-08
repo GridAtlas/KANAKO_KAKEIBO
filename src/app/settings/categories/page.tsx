@@ -35,21 +35,21 @@ export default function CategoriesPage() {
 
   return (
     <div className="flex-1 p-3 pb-32 space-y-3">
-      <header className="sticky top-0 bg-slate-50 pb-2 z-10 flex items-center gap-2 pt-1">
+      <header className="sticky top-0 bg-pink-50/95 pb-2 z-10 flex items-center gap-2 pt-1">
         <Link
           href="/settings"
-          className="tap-target -ml-1 p-1 text-slate-500"
+          className="tap-target -ml-1 p-1 text-stone-500"
           aria-label="戻る"
         >
           <ArrowLeft size={22} />
         </Link>
-        <h1 className="font-semibold text-slate-700">カテゴリ管理</h1>
+        <h1 className="font-semibold text-stone-700">カテゴリ管理</h1>
       </header>
 
       {!hydrated ? (
-        <div className="text-center text-sm text-slate-400 py-6">読み込み中…</div>
+        <div className="text-center text-sm text-stone-400 py-6">読み込み中…</div>
       ) : showForm || editing ? (
-        <div className="rounded-2xl bg-white border border-slate-200 p-3">
+        <div className="rounded-2xl bg-white/90 border border-pink-100 p-3">
           <CategoryForm
             initial={editing ?? undefined}
             onSubmit={() => {
@@ -66,14 +66,14 @@ export default function CategoriesPage() {
         <button
           type="button"
           onClick={() => setShowForm(true)}
-          className="tap-target w-full inline-flex items-center justify-center gap-1 rounded-xl bg-emerald-600 text-white py-3 font-semibold active:bg-emerald-700"
+          className="tap-target w-full inline-flex items-center justify-center gap-1 rounded-xl bg-pink-500 text-white py-3 font-semibold active:bg-pink-600"
         >
           <Plus size={18} />
           <span>カテゴリを追加</span>
         </button>
       )}
 
-      <div className="rounded-2xl bg-white border border-slate-200 overflow-hidden divide-y divide-slate-100">
+      <div className="rounded-2xl bg-white/90 border border-pink-100 overflow-hidden divide-y divide-pink-50">
         {sorted.map((c, i) => {
           const Icon = getIcon(c.icon);
           return (
@@ -82,7 +82,7 @@ export default function CategoriesPage() {
                 <button
                   type="button"
                   onClick={() => move(c.id, -1)}
-                  className="tap-target -my-1 h-6 flex items-center text-slate-400"
+                  className="tap-target -my-1 h-6 flex items-center text-stone-400"
                   disabled={i === 0}
                   aria-label="上へ"
                 >
@@ -91,7 +91,7 @@ export default function CategoriesPage() {
                 <button
                   type="button"
                   onClick={() => move(c.id, 1)}
-                  className="tap-target -my-1 h-6 flex items-center text-slate-400"
+                  className="tap-target -my-1 h-6 flex items-center text-stone-400"
                   disabled={i === sorted.length - 1}
                   aria-label="下へ"
                 >
@@ -112,14 +112,14 @@ export default function CategoriesPage() {
                     </span>
                   )}
                 </div>
-                <div className="text-[11px] text-slate-500">
+                <div className="text-[11px] text-stone-500">
                   {c.type === "expense" ? "支出" : "収入"}
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setEditing(c)}
-                className="tap-target p-1 text-slate-500 active:text-emerald-600"
+                className="tap-target p-1 text-stone-500 active:text-pink-600"
                 aria-label="編集"
               >
                 <Pencil size={18} />
@@ -135,7 +135,7 @@ export default function CategoriesPage() {
                     removeCategory(c.id);
                   }
                 }}
-                className="tap-target p-1 text-slate-400 active:text-rose-600"
+                className="tap-target p-1 text-stone-400 active:text-rose-600"
                 aria-label="削除"
               >
                 <Trash2 size={18} />

@@ -16,7 +16,7 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-30"
+      className="fixed bottom-0 left-0 right-0 bg-white/95 border-t border-pink-100 shadow-[0_-8px_24px_rgba(244,114,182,0.12)] backdrop-blur z-30"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       aria-label="ボトムナビゲーション"
     >
@@ -26,7 +26,7 @@ export function BottomNav() {
         {/* Center FAB */}
         <Link
           href="/add"
-          className="absolute left-1/2 -top-5 -translate-x-1/2 tap-target w-14 h-14 rounded-full bg-emerald-600 text-white shadow-lg active:bg-emerald-700 flex items-center justify-center"
+          className="absolute left-1/2 -top-5 -translate-x-1/2 tap-target w-14 h-14 rounded-full bg-pink-500 text-white shadow-lg shadow-pink-200/80 active:bg-pink-600 flex items-center justify-center"
           aria-label="登録"
         >
           <Plus size={28} strokeWidth={2.5} />
@@ -56,7 +56,7 @@ function NavItem({
     <Link
       href={tab.href}
       className={`tap-target flex-1 flex flex-col items-center justify-center gap-0.5 text-[11px] ${
-        active ? "text-emerald-600" : "text-slate-500"
+        active ? "text-pink-600" : "text-stone-500"
       }`}
     >
       <Icon size={22} />

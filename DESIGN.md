@@ -169,6 +169,13 @@ function getMonthlyByCategory(monthKey: string) {
 
 ## モバイル UI 詳細
 
+### Home タイトル / 分析セクション
+
+- Home 先頭に `TitleHero` を表示し、`public/images/kanako-title.jpg` を背景画像として使う。表示タイトルは「かなこの家計簿VER0.2」。
+- `MonthlyInsights` は `selectedMonth` を基準に直近 6 か月を `shiftMonthKey` で作り、`getMonthlyTotals(monthKey)` から収入 / 支出 / 収支を算出する。
+- 貯金率は `balance / income * 100`。収入が 0 の月は `--` 表示として、ゼロ除算しない。
+- 月次推移グラフは recharts の `BarChart`。ピンクを支出、グリーンを収入に固定し、データは localStorage 由来の store だけから読む。
+
 ### BottomNav 構造
 
 ```
@@ -211,7 +218,7 @@ function getMonthlyByCategory(monthKey: string) {
 
 - Tailwind utility class 直接
 - 色設計:
-  - Primary: `emerald-600`
+  - Primary: `pink-500` / 背景: `pink-50` とクリーム系グラデーション
   - 支出: `text-rose-600 bg-rose-50 border-rose-200`
   - 収入: `text-emerald-600 bg-emerald-50 border-emerald-200`
   - 固定費バッジ: `text-amber-700 bg-amber-100`

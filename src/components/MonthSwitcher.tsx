@@ -13,7 +13,7 @@ export function MonthSwitcher() {
     <div className="flex items-center justify-center gap-2 py-1">
       <button
         type="button"
-        className="tap-target rounded-full p-1 text-slate-500 active:bg-slate-100"
+        className="tap-target rounded-full p-1 text-stone-500 active:bg-pink-100"
         onClick={() => setSelectedMonth(shiftMonthKey(monthKey, -1))}
         aria-label="前月"
       >
@@ -21,17 +21,17 @@ export function MonthSwitcher() {
       </button>
       <button
         type="button"
-        className="font-semibold text-slate-700 px-3 py-1 rounded-lg active:bg-slate-100"
+        className="font-semibold text-stone-700 px-3 py-1 rounded-lg active:bg-pink-100"
         onClick={() => setSelectedMonth(currentMonthKey())}
       >
         {formatMonthLabel(monthKey)}
         {!isCurrent && (
-          <span className="ml-1 text-[10px] text-emerald-600">今月へ戻る</span>
+          <span className="ml-1 text-[10px] text-pink-600">今月へ戻る</span>
         )}
       </button>
       <button
         type="button"
-        className="tap-target rounded-full p-1 text-slate-500 active:bg-slate-100"
+        className="tap-target rounded-full p-1 text-stone-500 active:bg-pink-100"
         onClick={() => setSelectedMonth(shiftMonthKey(monthKey, 1))}
         aria-label="翌月"
       >

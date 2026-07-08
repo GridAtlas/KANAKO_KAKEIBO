@@ -14,7 +14,7 @@ export function ExpensePieChart({ data }: Props) {
 
   if (expenseOnly.length === 0) {
     return (
-      <div className="rounded-2xl bg-white border border-slate-200 p-6 text-center text-sm text-slate-400">
+      <div className="rounded-2xl bg-white/90 border border-pink-100 p-6 text-center text-sm text-stone-400">
         今月のデータはまだありません
       </div>
     );
@@ -27,8 +27,8 @@ export function ExpensePieChart({ data }: Props) {
   }));
 
   return (
-    <div className="rounded-2xl bg-white border border-slate-200 p-3">
-      <div className="text-xs text-slate-500 mb-1 px-1">支出の内訳</div>
+    <div className="rounded-2xl bg-white/90 border border-pink-100 p-3 shadow-sm shadow-pink-100/60">
+      <div className="text-xs text-stone-500 mb-1 px-1">支出の内訳</div>
       <div className="h-56">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -51,7 +51,7 @@ export function ExpensePieChart({ data }: Props) {
               contentStyle={{
                 fontSize: 12,
                 borderRadius: 8,
-                border: "1px solid #e2e8f0",
+                border: "1px solid #fbcfe8",
               }}
             />
           </PieChart>
@@ -66,7 +66,7 @@ export function ExpensePieChart({ data }: Props) {
               style={{ backgroundColor: d.color }}
             />
             <span className="truncate">{d.name}</span>
-            <span className="num ml-auto text-slate-500">
+            <span className="num ml-auto text-stone-500">
               {formatYen(d.value)}
             </span>
           </div>

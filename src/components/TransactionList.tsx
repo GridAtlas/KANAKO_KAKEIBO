@@ -19,14 +19,14 @@ export function TransactionList({ items, emptyText, onItemClick }: Props) {
 
   if (items.length === 0) {
     return (
-      <div className="rounded-2xl bg-white border border-slate-200 p-6 text-center text-sm text-slate-400">
+      <div className="rounded-2xl bg-white/90 border border-pink-100 p-6 text-center text-sm text-stone-400">
         {emptyText ?? "まだ取引がありません"}
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl bg-white border border-slate-200 overflow-hidden divide-y divide-slate-100">
+    <div className="rounded-2xl bg-white/90 border border-pink-100 overflow-hidden divide-y divide-pink-50">
       {items.map((t) => {
         const cat = getCategoryById(t.categoryId);
         const Icon = getIcon(cat?.icon ?? "HelpCircle");
@@ -54,14 +54,14 @@ export function TransactionList({ items, emptyText, onItemClick }: Props) {
                   </span>
                 )}
               </div>
-              <div className="text-xs text-slate-500 truncate">
+              <div className="text-xs text-stone-500 truncate">
                 {formatDateShort(t.date)}
                 {t.memo ? ` · ${t.memo}` : ""}
               </div>
             </div>
             <div
               className={`num font-bold ${
-                isIncome ? "text-emerald-600" : "text-slate-900"
+                isIncome ? "text-emerald-600" : "text-stone-900"
               }`}
             >
               {isIncome ? "+" : ""}
@@ -69,7 +69,7 @@ export function TransactionList({ items, emptyText, onItemClick }: Props) {
             </div>
             <button
               type="button"
-              className="tap-target -mr-1 p-1 text-slate-400 hover:text-rose-600"
+              className="tap-target -mr-1 p-1 text-stone-400 hover:text-rose-600"
               aria-label="削除"
               onClick={(e) => {
                 e.stopPropagation();

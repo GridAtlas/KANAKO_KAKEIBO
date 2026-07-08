@@ -61,11 +61,11 @@ export function FixedCostForm({ initial, onSubmit, onCancel }: Props) {
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
       <div>
-        <label className="block text-xs text-slate-500 mb-1">カテゴリ</label>
+        <label className="block text-xs text-stone-500 mb-1">カテゴリ</label>
         <select
           value={categoryId}
           onChange={(e) => setCategoryId(e.target.value)}
-          className="w-full rounded-xl bg-white border border-slate-200 px-3 py-3"
+          className="w-full rounded-xl bg-white/90 border border-pink-100 px-3 py-3"
         >
           {fixedExpenseCategories.map((c) => (
             <option key={c.id} value={c.id}>
@@ -77,9 +77,9 @@ export function FixedCostForm({ initial, onSubmit, onCancel }: Props) {
       </div>
 
       <div>
-        <label className="block text-xs text-slate-500 mb-1">金額</label>
-        <div className="flex items-center rounded-xl bg-white border border-slate-200 px-4 py-3">
-          <span className="text-xl font-bold text-slate-400 mr-2">¥</span>
+        <label className="block text-xs text-stone-500 mb-1">金額</label>
+        <div className="flex items-center rounded-xl bg-white/90 border border-pink-100 px-4 py-3">
+          <span className="text-xl font-bold text-stone-400 mr-2">¥</span>
           <input
             type="text"
             inputMode="numeric"
@@ -92,7 +92,7 @@ export function FixedCostForm({ initial, onSubmit, onCancel }: Props) {
       </div>
 
       <div>
-        <label className="block text-xs text-slate-500 mb-1">
+        <label className="block text-xs text-stone-500 mb-1">
           支払い日（毎月）
         </label>
         <input
@@ -101,15 +101,15 @@ export function FixedCostForm({ initial, onSubmit, onCancel }: Props) {
           max={31}
           value={paymentDay}
           onChange={(e) => setPaymentDay(Number(e.target.value) || 1)}
-          className="w-full rounded-xl bg-white border border-slate-200 px-4 py-3"
+          className="w-full rounded-xl bg-white/90 border border-pink-100 px-4 py-3"
         />
-        <p className="text-[11px] text-slate-500 mt-1">
+        <p className="text-[11px] text-stone-500 mt-1">
           月末が該当日より少ない月（例: 2 月の 30 日）は月末に自動調整
         </p>
       </div>
 
       <div>
-        <label className="block text-xs text-slate-500 mb-1">
+        <label className="block text-xs text-stone-500 mb-1">
           ラベル（任意）
         </label>
         <input
@@ -117,7 +117,7 @@ export function FixedCostForm({ initial, onSubmit, onCancel }: Props) {
           value={label}
           onChange={(e) => setLabel(e.target.value)}
           placeholder="例: Netflix, 家賃"
-          className="w-full rounded-xl bg-white border border-slate-200 px-4 py-3"
+          className="w-full rounded-xl bg-white/90 border border-pink-100 px-4 py-3"
         />
       </div>
 
@@ -126,7 +126,7 @@ export function FixedCostForm({ initial, onSubmit, onCancel }: Props) {
           type="checkbox"
           checked={active}
           onChange={(e) => setActive(e.target.checked)}
-          className="w-5 h-5 accent-emerald-500"
+          className="w-5 h-5 accent-pink-500"
         />
         <span>有効（毎月自動計上）</span>
       </label>
@@ -135,14 +135,14 @@ export function FixedCostForm({ initial, onSubmit, onCancel }: Props) {
         <button
           type="button"
           onClick={onCancel}
-          className="tap-target flex-1 rounded-xl bg-slate-200 text-slate-700 py-2 font-semibold active:bg-slate-300"
+          className="tap-target flex-1 rounded-xl bg-pink-100 text-stone-700 py-2 font-semibold active:bg-pink-200"
         >
           キャンセル
         </button>
         <button
           type="submit"
           disabled={!canSubmit}
-          className="tap-target flex-1 rounded-xl bg-emerald-600 text-white py-2 font-semibold active:bg-emerald-700 disabled:opacity-40"
+          className="tap-target flex-1 rounded-xl bg-pink-500 text-white py-2 font-semibold active:bg-pink-600 disabled:opacity-40"
         >
           {initial ? "更新" : "追加"}
         </button>

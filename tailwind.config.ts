@@ -13,9 +13,11 @@ const config: Config = {
     ...CATEGORY_COLORS.flatMap((c) => [
       `bg-${c}-50`,
       `bg-${c}-100`,
+      `bg-${c}-500`,
       `text-${c}-600`,
       `text-${c}-700`,
       `border-${c}-200`,
+      `border-${c}-300`,
       `ring-${c}-300`,
     ]),
   ],

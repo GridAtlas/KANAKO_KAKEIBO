@@ -2,10 +2,7 @@
 
 import { useState } from "react";
 import { useBudgetStore } from "@/store/useBudgetStore";
-import {
-  AVAILABLE_COLORS,
-  AVAILABLE_ICONS,
-} from "@/lib/constants";
+import { AVAILABLE_COLORS, AVAILABLE_ICONS } from "@/lib/constants";
 import { getIcon } from "@/lib/icons";
 import type { Category, CategoryType } from "@/types";
 
@@ -33,7 +30,13 @@ export function CategoryForm({ initial, onSubmit, onCancel }: Props) {
     e.preventDefault();
     if (!canSubmit) return;
     if (initial) {
-      updateCategory(initial.id, { name: name.trim(), icon, color, type, isFixedCost });
+      updateCategory(initial.id, {
+        name: name.trim(),
+        icon,
+        color,
+        type,
+        isFixedCost,
+      });
     } else {
       addCategory({ name: name.trim(), icon, color, type, isFixedCost });
     }
@@ -43,18 +46,18 @@ export function CategoryForm({ initial, onSubmit, onCancel }: Props) {
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
       <div>
-        <label className="block text-xs text-slate-500 mb-1">名称</label>
+        <label className="block text-xs text-stone-500 mb-1">名称</label>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="例: サウナ代"
-          className="w-full rounded-xl bg-white border border-slate-200 px-4 py-3 outline-none"
+          className="w-full rounded-xl bg-white/90 border border-pink-100 px-4 py-3 outline-none"
         />
       </div>
 
       <div>
-        <label className="block text-xs text-slate-500 mb-1">種別</label>
+        <label className="block text-xs text-stone-500 mb-1">種別</label>
         <div className="flex gap-2">
           <button
             type="button"
@@ -62,7 +65,7 @@ export function CategoryForm({ initial, onSubmit, onCancel }: Props) {
             className={`tap-target flex-1 rounded-lg py-2 font-semibold ${
               type === "expense"
                 ? "bg-rose-100 text-rose-700 border border-rose-200"
-                : "bg-white text-slate-500 border border-slate-200"
+                : "bg-white text-stone-500 border border-pink-100"
             }`}
           >
             支出
@@ -73,7 +76,7 @@ export function CategoryForm({ initial, onSubmit, onCancel }: Props) {
             className={`tap-target flex-1 rounded-lg py-2 font-semibold ${
               type === "income"
                 ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
-                : "bg-white text-slate-500 border border-slate-200"
+                : "bg-white text-stone-500 border border-pink-100"
             }`}
           >
             収入
@@ -94,7 +97,7 @@ export function CategoryForm({ initial, onSubmit, onCancel }: Props) {
       )}
 
       <div>
-        <label className="block text-xs text-slate-500 mb-1">色</label>
+        <label className="block text-xs text-stone-500 mb-1">色</label>
         <div className="grid grid-cols-6 gap-2">
           {AVAILABLE_COLORS.map((c) => (
             <button
@@ -102,7 +105,7 @@ export function CategoryForm({ initial, onSubmit, onCancel }: Props) {
               type="button"
               onClick={() => setColor(c)}
               className={`tap-target rounded-full bg-${c}-500 h-9 w-9 border-2 ${
-                color === c ? "border-slate-900" : "border-transparent"
+                color === c ? "border-stone-800" : "border-transparent"
               }`}
               aria-label={c}
             />
@@ -111,7 +114,7 @@ export function CategoryForm({ initial, onSubmit, onCancel }: Props) {
       </div>
 
       <div>
-        <label className="block text-xs text-slate-500 mb-1">アイコン</label>
+        <label className="block text-xs text-stone-500 mb-1">アイコン</label>
         <div className="grid grid-cols-6 gap-2 max-h-48 overflow-y-auto">
           {AVAILABLE_ICONS.map((name) => {
             const Icon = getIcon(name);
@@ -123,7 +126,7 @@ export function CategoryForm({ initial, onSubmit, onCancel }: Props) {
                 className={`tap-target rounded-lg h-11 flex items-center justify-center border ${
                   icon === name
                     ? `bg-${color}-100 border-${color}-300`
-                    : "bg-white border-slate-200"
+                    : "bg-white/90 border-pink-100"
                 }`}
               >
                 <Icon size={20} />
@@ -137,14 +140,14 @@ export function CategoryForm({ initial, onSubmit, onCancel }: Props) {
         <button
           type="button"
           onClick={onCancel}
-          className="tap-target flex-1 rounded-xl bg-slate-200 text-slate-700 py-2 font-semibold active:bg-slate-300"
+          className="tap-target flex-1 rounded-xl bg-pink-100 text-stone-700 py-2 font-semibold active:bg-pink-200"
         >
           キャンセル
         </button>
         <button
           type="submit"
           disabled={!canSubmit}
-          className="tap-target flex-1 rounded-xl bg-emerald-600 text-white py-2 font-semibold active:bg-emerald-700 disabled:opacity-40"
+          className="tap-target flex-1 rounded-xl bg-pink-500 text-white py-2 font-semibold active:bg-pink-600 disabled:opacity-40"
         >
           {initial ? "更新" : "追加"}
         </button>

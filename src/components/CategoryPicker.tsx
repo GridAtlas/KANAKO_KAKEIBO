@@ -52,7 +52,7 @@ function CategoryTile({
       className={`tap-target flex flex-col items-center justify-center gap-1 rounded-xl p-2 border transition ${
         selected
           ? `bg-${category.color}-100 border-${category.color}-300 ring-2 ring-${category.color}-300`
-          : "bg-white border-slate-200 active:bg-slate-100"
+          : "bg-white/90 border-pink-100 active:bg-pink-100"
       }`}
     >
       <div
