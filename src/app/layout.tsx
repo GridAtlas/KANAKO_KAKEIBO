@@ -3,7 +3,7 @@ import { BottomNav } from "@/components/BottomNav";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "かなこの家計簿VER0.2",
+  title: "かなこの家計簿 ver0.2",
   description:
     "スマホで動く WEB 家計簿アプリ。カテゴリ自由設定、固定費自動計上、円グラフ可視化。",
 };

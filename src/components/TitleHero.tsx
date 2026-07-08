@@ -4,7 +4,7 @@ const assetBasePath = process.env.NODE_ENV === "production" ? "/KANAKO_KAKEIBO" 
 
 export function TitleHero() {
   return (
-    <section className="-mx-3 -mt-3 relative h-[360px] overflow-hidden bg-pink-100">
+    <section className="relative h-[390px] overflow-hidden rounded-[28px] bg-pink-100 shadow-xl shadow-pink-200/50">
       <Image
         src={`${assetBasePath}/images/kanako-title.jpg`}
         alt="家計簿をつけるかなこのイラスト"
@@ -18,8 +18,11 @@ export function TitleHero() {
         <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-pink-100">
           Kanako Kakeibo
         </p>
-        <h1 className="mt-1 text-3xl font-bold leading-tight drop-shadow-sm">
-          かなこの家計簿VER0.2
+        <h1 className="mt-1 flex flex-wrap items-end gap-2 text-3xl font-bold leading-tight drop-shadow-sm">
+          <span>かなこの家計簿</span>
+          <span className="pb-0.5 text-sm font-semibold lowercase tracking-wide text-pink-100">
+            ver0.2
+          </span>
         </h1>
         <p className="mt-2 text-sm font-medium text-pink-50 drop-shadow-sm">
           毎月の支出と貯金の流れを、やさしく見える化。
