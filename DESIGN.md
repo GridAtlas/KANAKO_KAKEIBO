@@ -176,6 +176,12 @@ function getMonthlyByCategory(monthKey: string) {
 - 貯金率は `balance / income * 100`。収入が 0 の月は `--` 表示として、ゼロ除算しない。
 - 月次推移グラフは recharts の `BarChart`。ピンクを支出、グリーンを収入に固定し、データは localStorage 由来の store だけから読む。
 
+### PWA アイコン
+
+- PWA / Apple touch / favicon の各アイコンは `public/images/kanako-title.jpg` の顔部分から生成する。
+- 通常アイコンは `public/icons/kanako-icon-192.png` / `public/icons/kanako-icon-512.png`、maskable は余白多めの `public/icons/kanako-maskable-512.png` を使う。
+- `public/manifest.webmanifest` は GitHub Pages の basePath でも壊れないよう、icon / start_url / scope を相対パスで定義する。`layout.tsx` の metadata では production 時だけ `/KANAKO_KAKEIBO` を付ける。
+
 ### BottomNav 構造
 
 ```
