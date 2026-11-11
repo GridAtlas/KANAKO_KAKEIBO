@@ -9,11 +9,12 @@ const TABS = [
   { href: "/history", label: "履歴", icon: List },
   { href: "/settings", label: "設定", icon: Settings },
 ];
-const HOME_ROUTES = ["/", "/today", "/calendar", "/dashboard", "/trends", "/wardrobe", "/weekly"];
+const HOME_ROUTES = ["/", "/today", "/calendar", "/dashboard", "/trends", "/wardrobe", "/weekly", "/savings"];
 
 export function BottomNav() {
   const pathname = usePathname()?.replace(/\/$/, "") || "/";
   const isAddPage = pathname === "/add";
+  const isEditPage = pathname === "/history/edit";
 
   return (
     <nav
@@ -23,9 +24,9 @@ export function BottomNav() {
     >
       <div className="relative mx-auto grid h-16 max-w-md grid-cols-[1fr_1fr_62px_2fr] items-center">
         <NavItem tab={TABS[0]} active={HOME_ROUTES.includes(pathname)} />
-        <NavItem tab={TABS[1]} active={pathname === "/history"} />
+        <NavItem tab={TABS[1]} active={pathname === "/history" || isEditPage} />
         <div aria-hidden="true" />
-        {!isAddPage && (
+        {!isAddPage && !isEditPage && (
           <Link
             href="/add"
             className="tap-target absolute left-1/2 top-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-[15px] bg-[var(--accent)] text-white shadow-[0_4px_9px_rgba(165,60,85,0.24)] hover:bg-[var(--accent-hover)]"

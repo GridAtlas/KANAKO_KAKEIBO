@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { CalendarRange, ChevronRight, Flower, NotebookPen, type LucideIcon } from "lucide-react";
+import { CalendarRange, ChevronRight, Flower, NotebookPen, PiggyBank, type LucideIcon } from "lucide-react";
 import { BudgetPageHeader } from "@/components/BudgetPageHeader";
 import { MiniKanako } from "@/components/MiniKanako";
 import { getDailyBudgetMonth, getDailyBudgetStatus, getMiniKanakoStage, type DailyBudgetDay } from "@/lib/dailyBudget";
@@ -34,6 +34,7 @@ export default function TodayPage() {
               detail={`今月 ${getDailyBudgetMonth(monthKeyOf(today), today, goals, spending).filter((day) => day.status === "achieved").length}日`}
             />
             <DetailLink href="/dashboard" label="月の家計簿" icon={NotebookPen} tone="gold" />
+            <DetailLink href="/savings" label="目的別の貯金" icon={PiggyBank} tone="sage" />
           </nav>
         </>
       ) : (
