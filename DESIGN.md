@@ -200,8 +200,9 @@ function getMonthlyByCategory(monthKey: string) {
 
 ### ミニかなこの着せ替え
 
-- ホームの「着せ替え」から `/wardrobe` を開く。固定のボタンで衣装を選び、中央に1着ずつ表示する。前日までのはなまるを集計し、3日連続で「桜のおでかけ服」、7日連続で「星空のドレス」を解放する。導入前の目標履歴から達成した連続日数も集計する。
-- 解放済みの衣装と着用中の衣装を localStorage に保存する。連続記録が途切れても、解放済みの衣装は着用できる。各衣装に予算状況に応じた5段階のイラストがある。
+- ホームの「着せ替え」から `/wardrobe` を開く。ボタンで衣装を選び、中央に1着ずつ表示する。前日までのはなまるが3日・7日・10日・14日・21日連続すると、順に「桜のおでかけ服」「星空のドレス」「リネンの街歩き」「庭園のティードレス」「ベルベットの夜会服」が解放される。導入前の目標履歴から達成した連続日数も集計する。
+- 最初はエプロンを含む3着を表示する。3着目までそろうと次の3着を表示し、今後の衣装も3着ずつ同じ順番で表示する。未解放の衣装は番号とグレーのシルエットで予告する。
+- 解放済みの衣装と着用中の衣装を localStorage に保存する。連続記録が途切れても、解放済みの衣装は着用できる。各衣装に予算状況に応じた5段階のイラストがあり、同じ段階では頭の高さと裾の位置をエプロンに合わせる。
 
 ### 履歴の編集・よく使う支出・目的別の貯金
 
@@ -213,15 +214,35 @@ function getMonthlyByCategory(monthKey: string) {
 <details>
 <summary>着せ替え衣装の画像生成プロンプト</summary>
 
-内蔵 ImageGen で2つの衣装を作成し、`public/images/mini-kanako-blossom-{0..4}.webp` と `public/images/mini-kanako-starlight-{0..4}.webp` に保存。
+内蔵 ImageGen で5着を作成。画像は `public/images` 内の `mini-kanako-{blossom-v2,starlight-v2,linen,jardin,velvet}-{0..4}.webp` に保存した。
 
 **桜のおでかけ服**
 
-> Edit the supplied five-sticker transparent chibi contact sheet to create the spring cherry-blossom unlockable outfit for Mini Kanako, a Japanese budget journal app mascot. Image 1 is the exact source edit target and identity/pose/layout reference. Replace the cream blouse and tan apron in all five sprites with the SAME soft celadon mint-green spring outing dress, a natural fabric dress with sleeves and a modest rounded ivory scalloped collar, slim sage ribbon belt, and delicate blush-pink embroidered cherry blossom clusters on the bodice and toward the hem. The embroidery should be large enough to show at sticker size, with restrained clusters instead of busy allover pattern. Add one small pale pink five-petal blossom hair clip just above the same visible ear in all five sprites. Preserve the same recognizable faces, hairstyles, eyes, cheek color, expressions, handedness, poses, props, warm storybook texture, confident umber outlines, heights, alignment, and five body proportions from the source. Preserve the five-stage order: round shocked Kanako with yellow surprise marks, sheepish slightly round Kanako with a coin purse and sweat drop, smiling everyday Kanako holding a closed pink notebook, poised slimmer Kanako holding a pencil and pink notebook, and slim celebrating Kanako with a raised fist and gold sparkles. Each outfit should fit her corresponding silhouette. Render EXACTLY five distinct three-quarter body transparent stickers in one landscape row at the same scale and in the same order, with a generous clear transparent gutter between each sticker, clear margin on every side, no floor, scenery, text, labels, or backdrop. Keep all hair, hands, props, dress hems, and stars fully in frame. Target a 3:1 landscape sheet with true alpha around all five figures.
+> Replace the cream blouse and beige apron in all five figures with one refined Japanese spring outing outfit: a dusty-rose lightweight short jacket, fine seam lines and one very small dusty-pink petal-shaped brooch on the lapel, layered over a flowing ivory midi dress with softly pleated skirt visible down to the source hem. Keep the jacket visibly pink and the dress ivory. Wearable modern styling, understated details, no scattered cherry-blossom motifs.
 
 **星空のドレス**
 
-> Use case: identity-preserve try-on. Create one transparent horizontal contact sheet for the Mini Kanako household-budget app, containing exactly five standalone matching chibi illustrations, one per input in the same order from left to right. Reference images 1 through 5 are the same adult Japanese woman in her five spending-result poses. Change only her outfit to a vintage midnight-blue/periwinkle starlight dress with gently puffed sleeves, ivory scalloped neckline, muted indigo layered skirt, fine pale-gold embroidered stars and crescent moons, and a small gold crescent hairpin. Keep the exact same identity, near-black shoulder-length hair and side-swept fringe, skin tone, facial expressions, silhouette, proportions, body angle, framing, hand positions, personal props and reaction effects as each reference. In order: 1 wide round body, surprised open mouth, hands at sides of belly and orange surprise marks; 2 rounded body, sheepish smile, teardrop and pink coin purse; 3 normal body, open smile and pink notebook; 4 slimmer upright pose with pencil in one hand and pink notebook in the other; 5 joyful slim pose with eyes closed, raised fist and gold sparkles. Render in the same warm Japanese printed storybook illustration style with umber ink outlines, peachy cheeks, subtle paper grain and softly painted shading. Five evenly sized independent stickers in one horizontal row with centers at 10%, 30%, 50%, 70% and 90%, matching heights, generous fully transparent gutters, whole heads and skirts visible. Keep the silhouettes compact and legible at 160px. Transparent alpha throughout the background and gutters. No panel borders, ground, background props, captions, watermark or lettering. Wide landscape aspect ratio.
+> Replace the cream blouse and beige apron in all five figures with one polished evening outfit: a deep ink-navy tailored long-sleeve dress with a flattering square neckline, understated fine warm-gold piping at the collar and cuffs, and gentle skirt pleats. Add a tiny crescent-shaped gold earring on the already-visible ear without changing any facial or hair shape. Elegant modern evening wear, no costume effects, extra stars, capes or cosmic print.
+
+上の2着は各衣装の指定に、次の共通指定を続ける。
+
+> Image 1 is the exact edit target and registration guide for five Mini Kanako app sprites. Make a precise virtual outfit try-on. Change only the clothes and the specified tiny accessory in each of the same five existing sprites. Match the source image canvas, 3:1 ratio, five evenly separated poses in one row and true transparent alpha outside the silhouettes. Preserve the pixel placement, scale, shape, linework and colors of every existing head, hair, face, facial expression, hands and visible skin, every pose, object, proportions, and yellow accent marks. Keep the shoulder width, waist width, hip width, position of the garment hem and silhouette character of each stage. All five figures from left to right must remain: rounded surprised with hands at sides; sheepish slightly rounded holding a coin purse; smiling everyday holding a pink notebook; poised slimmer holding a pencil and notebook; slim celebrating with a raised arm and tiny sparkles. Clothing drapes within the same source outer bounds, with hem at exactly the same height. Preserve the warm Japanese printed storybook style, fine dark umber outlines, watercolor texture, diffuse soft lighting and full crisp details at small sizes. Keep the full hair, hands, props and all current accent marks inside the frame. No text, labels, backdrops, panels or scenery. Output exactly five stickers on a genuinely transparent background in the same wide contact sheet.
+
+リネン、庭園、ベルベットの3着は、次の共通指定の `OUTFIT` を各衣装の指定に差し替える。
+
+> Use case: identity-preserve try-on. Produce one transparent horizontal sprite contact sheet for the Mini Kanako wardrobe, with five independent stickers aligned at the same scale. Input images 1 to 5 are the five original apron sprites. They are exact pose, framing, art style and identity references. Copy the five original Mini Kanako adult chibi figures in the supplied left-to-right order and change only the outfit. In every pose replace the original clothing with OUTFIT. Keep every head at exactly the same size relative to the body as in its input. Keep the exact face, expression, eye shapes, warm skin tone, shoulder-length nearly-black hair, side fringe, head angle, body angle, hand positions, fingers, paper props and reaction marks. Preserve each input's apparent character width and height; match the original bust-to-lower-hem framing and never extend the garment below the original hem. Pose 1 is round and startled with hands on belly and orange reaction marks, pose 2 is sheepish with a pink coin purse and small tear, pose 3 smiles holding a pink notebook at waist, pose 4 is slimmer with pink notebook and pencil, pose 5 has a joyful closed-eye smile, raised fist and gold sparkles. Preserve the fine sepia outlines, warm watercolor shading and subtle paper grain of the original storybook rendering. Place all five figures in one horizontal row, one per equal cell, centers at 10%, 30%, 50%, 70%, and 90% of total width. Align the heads and lower hem to match the supplied poses; generous completely transparent gutters and space around every figure. No tile backgrounds, scenery, props beyond the source sprites, writing, borders, labels, logos, or shadows on the ground. True transparent alpha. Landscape 3:1 aspect ratio.
+
+**リネンの街歩き**
+
+> a contemporary warm-oat lightweight linen trench coat with a softly tailored waist, clean lapels and a slim muted olive scarf tucked close to her neck, suitable for a quiet bookstore outing. Keep the original shirt color visible only at the neckline. Understated modern city styling
+
+**庭園のティードレス**
+
+> a fitted muted-sage cardigan with an ivory collar over a refined cream botanical dress, with only a few small sparse sage embroidered leaves on the lower dress, suitable for garden tea. A simple clean silhouette and subtle knit texture, without hat or jewelry
+
+**ベルベットの夜会服**
+
+> a deep burgundy tailored velvet evening jacket with a crisp ivory collar, one restrained tiny antique gold lapel pin, and an understated charcoal skirt or dress below the fitted waist, suitable for a city evening. Understated modern city styling
 
 </details>
 
