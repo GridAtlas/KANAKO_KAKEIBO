@@ -1,6 +1,6 @@
 "use client";
 
-import { create } from "zustand";
+import { create, type StateCreator } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type {
   Category,
@@ -54,6 +54,7 @@ interface BudgetStore {
   dailyBudgetGoals: DailyBudgetGoal[];
   unlockedOutfits: OutfitId[];
   activeOutfit: OutfitId;
+  debugOutfit: OutfitId | null;
 
   // Categories
   addCategory: (input: CategoryInput) => Category;
@@ -90,6 +91,7 @@ interface BudgetStore {
 
   // Wardrobe
   updateWardrobe: (longestStreak: number, outfit?: OutfitId) => void;
+  setDebugOutfit: (outfit: OutfitId | null) => void;
 
   // Fixed cost application
   applyFixedCostsForMonth: (monthKey: string) => number;
@@ -152,8 +154,8 @@ function writeFeatureSnapshot({ transactionPresets, savingsGoals }: PresetsAndSa
   }
 }
 
-export const useBudgetStore = create<BudgetStore>()(
-  persist(
+const createBudgetStore: StateCreator<BudgetStore, [], [["zustand/persist", PersistedBudgetState]]> =
+  (setTransient, get, api) => persist<BudgetStore, [], [], PersistedBudgetState>(
     (set, get) => ({
       categories: seedCategories(),
       transactions: [],
@@ -163,6 +165,7 @@ export const useBudgetStore = create<BudgetStore>()(
       dailyBudgetGoals: [],
       ...initialWardrobe,
       ...initialPresetsAndSavings,
+      debugOutfit: null,
 
       addCategory: (input) => {
         const cat: Category = {
@@ -378,6 +381,9 @@ export const useBudgetStore = create<BudgetStore>()(
         set({ unlockedOutfits: availableOutfits, activeOutfit: selection });
       },
 
+      // 試着操作では persist を経由せず、家計簿データを書き戻さない。
+      setDebugOutfit: (debugOutfit) => setTransient({ debugOutfit }),
+
       applyFixedCostsForMonth: (monthKey) => {
         const { fixedCosts, appliedFixedCostMonths } = get();
         let count = 0;
@@ -456,5 +462,6 @@ export const useBudgetStore = create<BudgetStore>()(
         activeOutfit: state.activeOutfit,
       }),
     },
-  ),
-);
+  )(setTransient, get, api);
+
+export const useBudgetStore = create<BudgetStore>()(createBudgetStore);

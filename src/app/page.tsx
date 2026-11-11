@@ -1,14 +1,41 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowRight, Flower } from "lucide-react";
+import { useRef } from "react";
+import { useBudgetStore } from "@/store/useBudgetStore";
 
 const basePath = process.env.NEXT_PUBLIC_KANAKO_BASE_PATH ?? "";
+const tapIntervalMs = 1000;
 
 export default function TitlePage() {
+  const router = useRouter();
+  const coverTaps = useRef({ count: 0, lastTap: -Infinity });
+
+  function tapCover() {
+    const now = performance.now();
+    const { count, lastTap } = coverTaps.current;
+    const nextCount = now - lastTap <= tapIntervalMs ? count + 1 : 1;
+    coverTaps.current = { count: nextCount, lastTap: now };
+    if (nextCount !== 5) return;
+
+    coverTaps.current.count = 0;
+    const { activeOutfit, debugOutfit, setDebugOutfit } = useBudgetStore.getState();
+    setDebugOutfit(debugOutfit ?? activeOutfit);
+    router.push("/wardrobe");
+  }
+
   return (
     <main className="compact-page flex flex-1 flex-col items-center justify-center px-4 py-3 sm:px-5">
       <div className="w-full max-w-[min(100%,54dvh,27rem)] text-center">
-        <div className="cover-frame relative isolate aspect-square overflow-hidden rounded-[20px] border border-[#d8b49a] bg-[#f6e1d5]">
+        <button
+          type="button"
+          aria-label="表紙のかなこ"
+          onClick={tapCover}
+          className="cover-frame relative isolate block aspect-square w-full touch-manipulation select-none overflow-hidden rounded-[20px] border border-[#d8b49a] bg-[#f6e1d5]"
+        >
           <Image
             src={`${basePath}/images/kanako-title.jpg`}
             alt="家計簿をつけるかなこの表紙イラスト"
@@ -16,9 +43,10 @@ export default function TitlePage() {
             priority
             sizes="(max-width: 448px) 90vw, 432px"
             className="object-cover"
+            draggable={false}
           />
           <div aria-hidden="true" className="pointer-events-none absolute inset-[6px] rounded-[14px] border border-white/75" />
-        </div>
+        </button>
         <div className="mt-4 flex items-center justify-center gap-2.5 sm:mt-5">
           <Flower size={20} strokeWidth={1.45} className="shrink-0 text-[var(--gold)]" aria-hidden="true" />
           <h1 className="text-[clamp(1.45rem,6.5vw,2.2rem)] font-bold leading-tight tracking-tight text-[var(--ink)]">

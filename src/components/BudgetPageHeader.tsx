@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { CalendarDays, Flower } from "lucide-react";
+import type { ReactNode } from "react";
 
-export function BudgetPageHeader({ dateLabel }: { dateLabel?: string }) {
+export function BudgetPageHeader({ dateLabel, action }: { dateLabel?: string; action?: ReactNode }) {
   return (
     <header className="flex min-h-12 items-center justify-between gap-2 border-b border-[var(--line)] sm:min-h-14">
       <Link href="/" className="tap-target inline-flex min-w-0 items-center gap-2 rounded-lg text-[var(--ink)]">
@@ -10,12 +11,12 @@ export function BudgetPageHeader({ dateLabel }: { dateLabel?: string }) {
         </span>
         <span className="text-base font-bold tracking-tight sm:text-lg">かなこの家計簿</span>
       </Link>
-      {dateLabel && (
+      {action ?? (dateLabel && (
         <span className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold tabular-nums text-[var(--muted)] sm:text-sm">
           <CalendarDays size={15} strokeWidth={1.6} aria-hidden="true" />
           {dateLabel}
         </span>
-      )}
+      ))}
     </header>
   );
 }

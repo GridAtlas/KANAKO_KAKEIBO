@@ -63,7 +63,9 @@ const outfitPreviews: Record<OutfitId, {
 
 export default function WardrobePage() {
   const { today, goals, spending } = useDailyBudget();
-  const { currentStreak, longestStreak, unlockedOutfits, activeOutfit, setActiveOutfit } = useWardrobe(today, goals, spending);
+  const {
+    currentStreak, longestStreak, unlockedOutfits, activeOutfit, setActiveOutfit, isDebugMode, exitDebugMode,
+  } = useWardrobe(today, goals, spending);
   const [previewOutfit, setPreviewOutfit] = useState<OutfitId>();
   const selectedPreviewButton = useRef<HTMLButtonElement>(null);
   const visibleOutfits = getVisibleOutfits(unlockedOutfits);
@@ -78,7 +80,18 @@ export default function WardrobePage() {
 
   return (
     <main className="wide-page compact-page w-full px-3 pb-3 pt-2 sm:px-6 md:pt-5">
-      <BudgetPageHeader />
+      <BudgetPageHeader action={isDebugMode ? (
+        <button
+          type="button"
+          onClick={() => {
+            setPreviewOutfit(undefined);
+            exitDebugMode();
+          }}
+          className="tap-target shrink-0 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-2.5 text-xs font-bold text-[var(--accent)] hover:bg-[#fbebef]"
+        >
+          デバッグを終了
+        </button>
+      ) : undefined} />
       <section className="mx-auto mt-2 max-w-lg sm:mt-4">
         <header className="mb-2 flex min-h-7 flex-wrap items-center justify-between gap-x-2 gap-y-1 sm:mb-3">
           <h1 className="flex items-center gap-1.5 text-lg font-bold tracking-tight text-[#40262d] sm:text-2xl">
@@ -184,7 +197,7 @@ export default function WardrobePage() {
                 >
                   この衣装を着る
                 </button>
-              ) : goals.length === 0 ? (
+              ) : !isDebugMode && goals.length === 0 ? (
                 <Link href="/settings/daily-budget" className="tap-target flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#ecd9dd] bg-[#fffcf8] px-3 text-sm font-bold text-[#a53c55] hover:bg-[#fbebef]">
                   目標を設定する
                   <ArrowRight size={15} aria-hidden="true" />

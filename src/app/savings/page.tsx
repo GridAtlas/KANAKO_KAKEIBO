@@ -37,7 +37,7 @@ function positiveYen(input: string): number | undefined {
 
 export default function SavingsPage() {
   const goals = useBudgetStore((state) => state.savingsGoals);
-  const activeOutfit = useBudgetStore((state) => state.activeOutfit);
+  const activeOutfit = useBudgetStore((state) => state.debugOutfit ?? state.activeOutfit);
   const addGoal = useBudgetStore((state) => state.addSavingsGoal);
   const updateGoal = useBudgetStore((state) => state.updateSavingsGoal);
   const removeGoal = useBudgetStore((state) => state.removeSavingsGoal);
