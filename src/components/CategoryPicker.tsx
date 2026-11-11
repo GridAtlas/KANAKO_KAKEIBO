@@ -33,15 +33,15 @@ export function CategoryPicker({ selectedId, onSelect, filterType }: Props) {
     <fieldset className="min-w-0">
       <legend className="sr-only">カテゴリ</legend>
       <div className="mb-1 flex items-center justify-between">
-        <p className="text-sm font-bold text-[#765b50]" aria-hidden="true">カテゴリ</p>
+        <p className="text-sm font-bold text-[#755d62]" aria-hidden="true">カテゴリ</p>
         {pageCount > 1 && (
-          <div className="flex items-center gap-1 text-xs font-bold tabular-nums text-[#765b50]">
+          <div className="flex items-center gap-1 text-xs font-bold tabular-nums text-[#755d62]">
             <button
               type="button"
               aria-label="前のカテゴリページ"
               disabled={currentPage === 0}
               onClick={() => setPage(currentPage - 1)}
-              className="tap-target grid place-items-center rounded-lg text-[#983e34] enabled:hover:bg-[#faf2ea] disabled:opacity-35"
+              className="tap-target grid place-items-center rounded-lg text-[#a53c55] enabled:hover:bg-[#fbebef] disabled:opacity-35"
             >
               <ChevronLeft size={18} aria-hidden="true" />
             </button>
@@ -51,7 +51,7 @@ export function CategoryPicker({ selectedId, onSelect, filterType }: Props) {
               aria-label="次のカテゴリページ"
               disabled={currentPage === pageCount - 1}
               onClick={() => setPage(currentPage + 1)}
-              className="tap-target grid place-items-center rounded-lg text-[#983e34] enabled:hover:bg-[#faf2ea] disabled:opacity-35"
+              className="tap-target grid place-items-center rounded-lg text-[#a53c55] enabled:hover:bg-[#fbebef] disabled:opacity-35"
             >
               <ChevronRight size={18} aria-hidden="true" />
             </button>
@@ -68,7 +68,7 @@ export function CategoryPicker({ selectedId, onSelect, filterType }: Props) {
           />
         ))}
       </div>
-      {visible.length === 0 && <p className="py-2 text-sm text-[#765b50]">この種類のカテゴリはありません。</p>}
+      {visible.length === 0 && <p className="py-2 text-sm text-[#755d62]">この種類のカテゴリはありません。</p>}
     </fieldset>
   );
 }
@@ -90,8 +90,8 @@ function CategoryTile({
       aria-pressed={selected}
       className={`tap-target flex min-w-0 flex-col items-center justify-center gap-0.5 rounded-xl border px-1 py-0.5 ${
         selected
-          ? `bg-${category.color}-100 border-${category.color}-300 ring-1 ring-inset ring-${category.color}-300`
-          : "border-[#eadccf] bg-[#fffdf9] hover:bg-[#faf2ea]"
+          ? "border-[#a53c55] bg-[#f9e8ed] ring-1 ring-inset ring-[#a53c55]/20"
+          : "border-[#ecd9dd] bg-[#fffcf8] hover:bg-[#fbebef]"
       }`}
     >
       <div
@@ -99,7 +99,7 @@ function CategoryTile({
       >
         <Icon size={14} aria-hidden="true" />
       </div>
-      <span className="w-full truncate text-center text-[11px] font-semibold leading-tight text-[#3b2721]">
+      <span className="w-full truncate text-center text-[11px] font-semibold leading-tight text-[#40262d]">
         {category.name}
       </span>
     </button>

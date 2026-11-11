@@ -31,7 +31,7 @@ interface Props {
   onDelete?: () => void;
 }
 
-const fieldClass = "min-h-11 w-full min-w-0 rounded-lg border border-[#eadccf] bg-white px-2 text-[#3b2721]";
+const fieldClass = "min-h-11 w-full min-w-0 rounded-lg border border-[var(--line)] bg-white px-2 text-[var(--ink)]";
 
 export function CategoryForm({ initial, onSubmit, onCancel, onDelete }: Props) {
   const addCategory = useBudgetStore((s) => s.addCategory);
@@ -56,22 +56,22 @@ export function CategoryForm({ initial, onSubmit, onCancel, onDelete }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-2 text-[#3b2721]">
+    <form onSubmit={handleSubmit} className="space-y-2 text-[var(--ink)]">
       <label className="block text-xs font-bold">
         名称
         <input type="text" value={name} onChange={(event) => setName(event.target.value)} placeholder="例  趣味" className={`mt-1 ${fieldClass}`} />
       </label>
-      <div role="group" aria-label="種別" className="grid grid-cols-2 gap-1 rounded-xl bg-[#f4e7dc] p-1">
-        <button type="button" onClick={() => setType("expense")} aria-pressed={type === "expense"} className={`tap-target rounded-lg text-sm font-bold ${type === "expense" ? "bg-white text-rose-700" : "text-[#765b50]"}`}>
+      <div role="group" aria-label="種別" className="grid grid-cols-2 gap-1 rounded-xl bg-[#f9e5eb] p-1">
+        <button type="button" onClick={() => setType("expense")} aria-pressed={type === "expense"} className={`tap-target rounded-lg text-sm font-bold ${type === "expense" ? "bg-white text-rose-700" : "text-[var(--muted)]"}`}>
           支出
         </button>
-        <button type="button" onClick={() => setType("income")} aria-pressed={type === "income"} className={`tap-target rounded-lg text-sm font-bold ${type === "income" ? "bg-white text-emerald-700" : "text-[#765b50]"}`}>
+        <button type="button" onClick={() => setType("income")} aria-pressed={type === "income"} className={`tap-target rounded-lg text-sm font-bold ${type === "income" ? "bg-white text-emerald-700" : "text-[var(--muted)]"}`}>
           収入
         </button>
       </div>
       {type === "expense" && (
         <label className="flex min-h-11 items-center gap-2 text-sm">
-          <input type="checkbox" checked={isFixedCost} onChange={(event) => setIsFixedCost(event.target.checked)} className="h-5 w-5 accent-[#a13e34]" />
+          <input type="checkbox" checked={isFixedCost} onChange={(event) => setIsFixedCost(event.target.checked)} className="h-5 w-5 accent-[var(--accent)]" />
           固定費カテゴリ
         </label>
       )}
@@ -95,9 +95,9 @@ export function CategoryForm({ initial, onSubmit, onCancel, onDelete }: Props) {
         </div>
       </div>
       <div className="flex gap-2 pt-1">
-        {onDelete && <button type="button" onClick={onDelete} className="tap-target rounded-lg px-2 text-xs font-bold text-[#a13e34] hover:bg-[#faf2ea]">削除</button>}
-        <button type="button" onClick={onCancel} className="tap-target flex-1 rounded-lg bg-[#f4e7dc] px-1 text-xs font-bold text-[#765b50]">戻る</button>
-        <button type="submit" disabled={!canSubmit} className="tap-target flex-1 rounded-lg bg-[#a13e34] px-1 text-sm font-bold text-white disabled:opacity-40">
+        {onDelete && <button type="button" onClick={onDelete} className="tap-target rounded-lg px-2 text-xs font-bold text-[var(--accent)] hover:bg-[#fcf1f4]">削除</button>}
+        <button type="button" onClick={onCancel} className="tap-target flex-1 rounded-lg bg-[#f9e5eb] px-1 text-xs font-bold text-[var(--muted)]">戻る</button>
+        <button type="submit" disabled={!canSubmit} className="tap-target flex-1 rounded-lg bg-[var(--accent)] px-1 text-sm font-bold text-white disabled:opacity-40">
           {initial ? "更新" : "追加"}
         </button>
       </div>

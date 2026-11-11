@@ -15,7 +15,7 @@ export default function WeeklyPage() {
         {today ? (
           <WeeklyBudgetCard week={getWeeklyBudget(today, goals, spending)} />
         ) : (
-          <p role="status" className="text-sm text-[#765b50]">読み込み中…</p>
+          <p role="status" className="text-sm text-[var(--muted)]">読み込み中…</p>
         )}
       </div>
     </main>

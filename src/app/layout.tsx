@@ -47,7 +47,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#fff8f0",
+  themeColor: "#fff8f4",
 };
 
 export default function RootLayout({
@@ -57,7 +57,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body className="font-sans text-stone-900 antialiased">
+      <body className="font-sans text-[var(--ink)] antialiased">
         <div className="app-shell relative mx-auto flex w-full max-w-6xl flex-col [&>*:not(.wide-page)]:mx-auto [&>*:not(.wide-page)]:w-full [&>*:not(.wide-page)]:max-w-md">
           {children}
         </div>

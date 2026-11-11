@@ -33,14 +33,14 @@ export function DashboardView() {
 
   return (
     <AnalyticsPage title="月の家計簿" linkHref="/trends" linkLabel="月ごとの推移">
-      <div role="group" aria-label="表示するデータ" className="grid grid-cols-2 gap-1 rounded-xl bg-[#f2e5d9] p-0.5">
+      <div role="group" aria-label="表示するデータ" className="grid grid-cols-2 gap-1 rounded-xl bg-[#f7e6ea] p-0.5">
         {dashboardViews.map(({ id, label }) => (
           <button
             key={id}
             type="button"
             aria-pressed={view === id}
             onClick={() => setView(id)}
-            className="tap-target rounded-[10px] px-2 text-sm font-bold text-[#765b50] aria-pressed:bg-[#fffdf8] aria-pressed:text-[#983e34]"
+            className="tap-target rounded-[10px] px-2 text-sm font-bold text-[var(--muted)] aria-pressed:bg-[var(--surface)] aria-pressed:text-[var(--accent)] aria-pressed:shadow-[inset_0_0_0_1px_#eacbd3]"
           >
             {label}
           </button>
@@ -53,14 +53,14 @@ export function DashboardView() {
             <button
               type="button"
               onClick={() => applyFixedCostsForMonth(monthKey)}
-              className="tap-target w-full rounded-xl border border-[#e8d3aa] bg-[#fbefd8] px-2 text-sm font-bold text-[#77541e] hover:bg-[#f8e6c5]"
+              className="tap-target w-full rounded-xl border border-[#ead8bd] bg-[#fbf3e6] px-2 text-sm font-bold text-[#795627] hover:bg-[#f7ebd7]"
             >
               固定費 {pendingFixedCosts} 件を計上
             </button>
           )}
           <Link
             href={{ pathname: "/history", query: { month: monthKey } }}
-            className="tap-target flex items-center justify-center gap-2 rounded-xl border border-[#eadccf] bg-[#fffdf8] px-2 text-sm font-bold text-[#983e34] hover:bg-[#f8ebe3]"
+            className="tap-target flex items-center justify-center gap-2 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-2 text-sm font-bold text-[var(--accent)] hover:bg-[#faedf0]"
           >
             この月の履歴
             <ArrowRight size={16} aria-hidden="true" />
@@ -102,8 +102,8 @@ function AnalyticsPage({
       <BudgetPageHeader />
       <div className="mx-auto max-w-xl">
         <div className="flex items-center justify-between gap-2">
-          <h1 className="text-lg font-bold text-[#3b2721]">{title}</h1>
-          <Link href={linkHref} className="tap-target inline-flex items-center gap-1.5 rounded-lg px-1.5 text-xs font-bold text-[#983e34] hover:bg-[#faede6] sm:text-sm">
+          <h1 className="display-type text-xl font-bold tracking-tight text-[var(--ink)]">{title}</h1>
+          <Link href={linkHref} className="tap-target inline-flex items-center gap-1.5 rounded-lg px-1.5 text-xs font-bold text-[var(--accent)] hover:bg-[#faedf0] sm:text-sm">
             {linkLabel}
             <ArrowRight size={15} aria-hidden="true" />
           </Link>
@@ -114,7 +114,7 @@ function AnalyticsPage({
             {children}
           </>
         ) : (
-          <p role="status" className="text-sm text-[#765b50]">読み込み中…</p>
+          <p role="status" className="text-sm text-[var(--muted)]">読み込み中…</p>
         )}
       </div>
     </main>

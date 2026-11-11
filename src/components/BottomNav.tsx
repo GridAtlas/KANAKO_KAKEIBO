@@ -17,7 +17,7 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-30 border-t border-[#eeded1] bg-[#fffdf8]/95 shadow-[0_-5px_25px_rgba(94,58,33,0.07)] backdrop-blur"
+      className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--line)] bg-[#fffcf8]/95 shadow-[0_-4px_18px_rgba(79,39,49,0.055)] backdrop-blur"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       aria-label="ボトムナビゲーション"
     >
@@ -28,10 +28,10 @@ export function BottomNav() {
         {!isAddPage && (
           <Link
             href="/add"
-            className="tap-target absolute left-1/2 top-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-xl bg-[#a13e34] text-white hover:bg-[#862e28]"
+            className="tap-target absolute left-1/2 top-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-[15px] bg-[var(--accent)] text-white shadow-[0_4px_9px_rgba(165,60,85,0.24)] hover:bg-[var(--accent-hover)]"
             aria-label="登録"
           >
-            <Plus size={28} strokeWidth={2.5} aria-hidden="true" />
+            <Plus size={27} strokeWidth={2} aria-hidden="true" />
           </Link>
         )}
         <NavItem
@@ -59,10 +59,12 @@ function NavItem({
       href={tab.href}
       aria-current={active ? "page" : undefined}
       className={`tap-target flex flex-col items-center justify-center gap-0.5 whitespace-nowrap rounded-xl px-0.5 text-[10px] font-semibold sm:text-xs ${
-        active ? "text-[#a13e34]" : "text-stone-600 hover:bg-[#f9efe6]"
+        active ? "text-[var(--accent)]" : "text-[var(--muted)] hover:text-[var(--accent)]"
       }`}
     >
-      <Icon size={21} aria-hidden="true" />
+      <span className={`grid h-7 w-10 place-items-center rounded-full ${active ? "bg-[#f9e5eb]" : ""}`}>
+        <Icon size={20} strokeWidth={1.8} aria-hidden="true" />
+      </span>
       <span>{tab.label}</span>
     </Link>
   );

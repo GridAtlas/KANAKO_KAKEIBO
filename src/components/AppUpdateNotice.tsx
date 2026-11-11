@@ -83,33 +83,33 @@ export function AppUpdateNotice() {
       ref={dialogRef}
       aria-labelledby="app-update-title"
       aria-describedby="app-update-description"
-      className="m-auto w-[calc(100%-2rem)] max-w-sm rounded-3xl border border-[#eadccf] bg-[#fffaf5] p-5 text-[#3b2721] shadow-xl backdrop:bg-stone-900/50"
+      className="m-auto w-[calc(100%-2rem)] max-w-sm rounded-3xl border border-[var(--line)] bg-[var(--surface)] p-5 text-[var(--ink)] shadow-xl backdrop:bg-stone-900/50"
       onCancel={(event) => {
         event.preventDefault();
         dismissUpdate();
       }}
     >
       <div className="flex items-center gap-3">
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#f4ded5] text-[#a13e34]">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[var(--blush)] text-[var(--accent)]">
           <RefreshCw size={19} aria-hidden="true" />
         </span>
         <h2 id="app-update-title" className="font-bold">新しいバージョンがあります</h2>
       </div>
-      <p id="app-update-description" className="mt-3 text-sm leading-relaxed text-[#765b50]">
+      <p id="app-update-description" className="mt-3 text-sm leading-relaxed text-[var(--muted)]">
         更新すると、この画面を読み込み直します。入力中の内容は先に保存できます。
       </p>
       <div className="mt-5 grid grid-cols-2 gap-2">
         <button
           type="button"
           autoFocus
-          className="min-h-11 rounded-xl border border-[#eadccf] bg-white px-2 text-sm font-semibold text-[#983e34] hover:bg-[#faede6]"
+          className="min-h-11 rounded-xl border border-[var(--line)] bg-white px-2 text-sm font-semibold text-[var(--accent)] hover:bg-[#fcf1f4]"
           onClick={dismissUpdate}
         >
           あとで
         </button>
         <button
           type="button"
-          className="min-h-11 rounded-xl bg-[#a13e34] px-2 text-sm font-semibold text-white hover:bg-[#862e28]"
+          className="min-h-11 rounded-xl bg-[var(--accent)] px-2 text-sm font-semibold text-white hover:bg-[var(--accent-hover)]"
           onClick={applyUpdate}
         >
           今すぐ更新

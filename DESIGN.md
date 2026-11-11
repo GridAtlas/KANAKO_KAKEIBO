@@ -264,13 +264,14 @@ function getMonthlyByCategory(monthKey: string) {
 ## スタイル方針
 
 - Tailwind utility class 直接
-- 色設計:
-  - Primary: `pink-500` / 背景: `pink-50` とクリーム系グラデーション
+- 共通色は `globals.css` のカスタムプロパティを使う。生成りの紙色をベースに、ローズを主要アクション、セージを週間予算、ゴールドを表紙や小さなアクセントに使う。
+- 表紙は元のイラストを細い額縁に収め、タイトルを画像の下に置く。ホームでは今日の金額を最も大きく表示し、花のモチーフは表紙やはなまるを中心に使う。
+- 収支の色分け
   - 支出: `text-rose-600 bg-rose-50 border-rose-200`
   - 収入: `text-emerald-600 bg-emerald-50 border-emerald-200`
   - 固定費バッジ: `text-amber-700 bg-amber-100`
-- フォント: システムフォント（layout.tsx で Noto Sans JP フォールバック）
-- 数値: `font-mono tabular-nums`（金額）、`font-semibold`
+- フォントはシステムフォント。表紙と見出しの一部に端末の明朝体を使う。
+- 金額は `tabular-nums` で桁を揃える。
 
 ## セキュリティ・プライバシー
 

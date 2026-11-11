@@ -11,13 +11,13 @@ export const budgetDayLabel: Record<DailyBudgetDay["status"], string> = {
 
 export function BudgetDayMark({ status }: { status: DailyBudgetDay["status"] }) {
   if (status === "achieved") {
-    return <Flower size={23} strokeWidth={1.9} className="text-[#a13e34]" aria-hidden="true" />;
+    return <Flower size={23} strokeWidth={1.8} className="fill-[#f3bdcd] text-[var(--accent)] [&_circle]:fill-[#fff0ce]" aria-hidden="true" />;
   }
   if (status === "over") {
-    return <Minus size={19} strokeWidth={2.5} className="text-[#815943]" aria-hidden="true" />;
+    return <Minus size={19} strokeWidth={2.5} className="text-[var(--gold)]" aria-hidden="true" />;
   }
   if (status === "pending") {
-    return <span className="h-2 w-2 rounded-full border border-[#a13e34]" aria-hidden="true" />;
+    return <span className="h-2 w-2 rounded-full border border-[var(--sage)]" aria-hidden="true" />;
   }
-  return <span className="h-1 w-1 rounded-full bg-[#ccb8aa]" aria-hidden="true" />;
+  return <span className="h-1 w-1 rounded-full bg-[#c8b5bb]" aria-hidden="true" />;
 }

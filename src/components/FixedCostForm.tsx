@@ -12,7 +12,7 @@ interface Props {
   onDelete?: () => void;
 }
 
-const fieldClass = "mt-1 min-h-11 w-full min-w-0 rounded-lg border border-[#eadccf] bg-white px-2 text-[#3b2721]";
+const fieldClass = "mt-1 min-h-11 w-full min-w-0 rounded-lg border border-[var(--line)] bg-white px-2 text-[var(--ink)]";
 
 export function FixedCostForm({ initial, onSubmit, onCancel, onDelete }: Props) {
   const addFixedCost = useBudgetStore((s) => s.addFixedCost);
@@ -39,7 +39,7 @@ export function FixedCostForm({ initial, onSubmit, onCancel, onDelete }: Props) 
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-2 text-[#3b2721]">
+    <form onSubmit={handleSubmit} className="space-y-2 text-[var(--ink)]">
       <div className="grid grid-cols-2 gap-2">
         <div className="min-w-0">
           <label htmlFor="fixed-category" className="block text-xs font-bold">カテゴリ</label>
@@ -74,15 +74,15 @@ export function FixedCostForm({ initial, onSubmit, onCancel, onDelete }: Props) 
           <input type="text" value={label} onChange={(event) => setLabel(event.target.value)} placeholder="例  家賃" className={fieldClass} />
         </label>
       </div>
-      <p className="text-xs text-[#765b50]">支払日がない月は、月末に計上します。</p>
+      <p className="text-xs text-[var(--muted)]">支払日がない月は、月末に計上します。</p>
       <label className="flex min-h-11 items-center gap-2 text-sm">
-        <input type="checkbox" checked={active} onChange={(event) => setActive(event.target.checked)} className="h-5 w-5 accent-[#a13e34]" />
+        <input type="checkbox" checked={active} onChange={(event) => setActive(event.target.checked)} className="h-5 w-5 accent-[var(--accent)]" />
         固定費の計上に含める
       </label>
       <div className="flex gap-2 pt-1">
-        {onDelete && <button type="button" onClick={onDelete} className="tap-target rounded-lg px-2 text-xs font-bold text-[#a13e34] hover:bg-[#faf2ea]">削除</button>}
-        <button type="button" onClick={onCancel} className="tap-target flex-1 rounded-lg bg-[#f4e7dc] px-1 text-xs font-bold text-[#765b50]">戻る</button>
-        <button type="submit" disabled={!canSubmit} className="tap-target flex-1 rounded-lg bg-[#a13e34] px-1 text-sm font-bold text-white disabled:opacity-40">
+        {onDelete && <button type="button" onClick={onDelete} className="tap-target rounded-lg px-2 text-xs font-bold text-[var(--accent)] hover:bg-[#fcf1f4]">削除</button>}
+        <button type="button" onClick={onCancel} className="tap-target flex-1 rounded-lg bg-[#f9e5eb] px-1 text-xs font-bold text-[var(--muted)]">戻る</button>
+        <button type="submit" disabled={!canSubmit} className="tap-target flex-1 rounded-lg bg-[var(--accent)] px-1 text-sm font-bold text-white disabled:opacity-40">
           {initial ? "更新" : "追加"}
         </button>
       </div>
