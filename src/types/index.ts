@@ -51,6 +51,34 @@ export interface TransactionInput {
   fixedCostId?: string;
 }
 
+export interface TransactionPresetInput {
+  categoryId: string;
+  amount: number;
+  memo?: string;
+}
+
+export interface TransactionPreset extends TransactionPresetInput {
+  id: string;
+  createdAt: number;
+}
+
+export interface SavingsContribution {
+  id: string;
+  amount: number;
+  createdAt: number;
+}
+
+export interface SavingsGoalInput {
+  name: string;
+  targetAmount: number;
+}
+
+export interface SavingsGoal extends SavingsGoalInput {
+  id: string;
+  contributions: SavingsContribution[];
+  createdAt: number;
+}
+
 export interface FixedCostInput {
   categoryId: string;
   amount: number;

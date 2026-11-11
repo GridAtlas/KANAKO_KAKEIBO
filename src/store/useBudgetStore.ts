@@ -9,8 +9,13 @@ import type {
   FixedCost,
   FixedCostInput,
   MonthlyTotals,
+  SavingsContribution,
+  SavingsGoal,
+  SavingsGoalInput,
   Transaction,
   TransactionInput,
+  TransactionPreset,
+  TransactionPresetInput,
 } from "@/types";
 import { DEFAULT_CATEGORIES, STORAGE_KEY, STORAGE_VERSION } from "@/lib/constants";
 import type { DailyBudgetGoal } from "@/lib/dailyBudget";
@@ -34,10 +39,16 @@ function seedCategories(): Category[] {
   }));
 }
 
+function isPositiveYen(amount: number): boolean {
+  return Number.isSafeInteger(amount) && amount > 0;
+}
+
 interface BudgetStore {
   categories: Category[];
   transactions: Transaction[];
+  transactionPresets: TransactionPreset[];
   fixedCosts: FixedCost[];
+  savingsGoals: SavingsGoal[];
   selectedMonth: string;
   appliedFixedCostMonths: Record<string, string[]>;
   dailyBudgetGoals: DailyBudgetGoal[];
@@ -54,6 +65,17 @@ interface BudgetStore {
   addTransaction: (input: TransactionInput) => Transaction;
   updateTransaction: (id: string, patch: Partial<TransactionInput>) => void;
   removeTransaction: (id: string) => void;
+
+  // Transaction presets
+  addTransactionPreset: (input: TransactionPresetInput) => TransactionPreset | undefined;
+  removeTransactionPreset: (id: string) => void;
+
+  // Savings goals
+  addSavingsGoal: (input: SavingsGoalInput) => SavingsGoal | undefined;
+  updateSavingsGoal: (id: string, input: SavingsGoalInput) => void;
+  removeSavingsGoal: (id: string) => void;
+  addSavingsContribution: (goalId: string, amount: number) => void;
+  removeSavingsContribution: (goalId: string, contributionId: string) => void;
 
   // FixedCosts
   addFixedCost: (input: FixedCostInput) => FixedCost;
@@ -83,7 +105,9 @@ type PersistedBudgetState = Pick<
   BudgetStore,
   | "categories"
   | "transactions"
+  | "transactionPresets"
   | "fixedCosts"
+  | "savingsGoals"
   | "selectedMonth"
   | "appliedFixedCostMonths"
   | "dailyBudgetGoals"
@@ -96,6 +120,38 @@ const initialWardrobe: Pick<PersistedBudgetState, "unlockedOutfits" | "activeOut
   activeOutfit: DEFAULT_OUTFIT,
 };
 
+type PresetsAndSavings = Pick<PersistedBudgetState, "transactionPresets" | "savingsGoals">;
+
+const featureSnapshotKey = `${STORAGE_KEY}:v4-features`;
+const initialPresetsAndSavings: PresetsAndSavings = {
+  transactionPresets: [],
+  savingsGoals: [],
+};
+
+function readFeatureSnapshot(): PresetsAndSavings {
+  try {
+    const stored = localStorage.getItem(featureSnapshotKey);
+    if (!stored) return initialPresetsAndSavings;
+
+    const snapshot = JSON.parse(stored) as Partial<PresetsAndSavings> | null;
+    return {
+      transactionPresets: Array.isArray(snapshot?.transactionPresets) ? snapshot.transactionPresets : [],
+      savingsGoals: Array.isArray(snapshot?.savingsGoals) ? snapshot.savingsGoals : [],
+    };
+  } catch {
+    return initialPresetsAndSavings;
+  }
+}
+
+function writeFeatureSnapshot({ transactionPresets, savingsGoals }: PresetsAndSavings) {
+  // 旧版が家計簿の保存を書き戻しても、新機能のデータだけは次回の移行で復元できる。
+  try {
+    localStorage.setItem(featureSnapshotKey, JSON.stringify({ transactionPresets, savingsGoals }));
+  } catch {
+    // 通常の保存は完了済み。追加のスナップショットは空き容量やストレージ設定に依存する。
+  }
+}
+
 export const useBudgetStore = create<BudgetStore>()(
   persist(
     (set, get) => ({
@@ -106,6 +162,7 @@ export const useBudgetStore = create<BudgetStore>()(
       appliedFixedCostMonths: {},
       dailyBudgetGoals: [],
       ...initialWardrobe,
+      ...initialPresetsAndSavings,
 
       addCategory: (input) => {
         const cat: Category = {
@@ -178,6 +235,95 @@ export const useBudgetStore = create<BudgetStore>()(
         set((s) => ({
           transactions: s.transactions.filter((t) => t.id !== id),
         }));
+      },
+
+      addTransactionPreset: ({ categoryId, amount, memo: inputMemo }) => {
+        if (!isPositiveYen(amount)) return;
+
+        const { categories, transactionPresets } = get();
+        if (!categories.some((category) => category.id === categoryId && category.type === "expense")) return;
+
+        const memo = inputMemo?.trim() || undefined;
+        const existing = transactionPresets.find(
+          (preset) => preset.categoryId === categoryId && preset.amount === amount && preset.memo === memo,
+        );
+        if (existing) return existing;
+
+        const preset: TransactionPreset = { id: uuid(), categoryId, amount, memo, createdAt: Date.now() };
+        set({ transactionPresets: [...transactionPresets, preset] });
+        writeFeatureSnapshot(get());
+        return preset;
+      },
+
+      removeTransactionPreset: (id) => {
+        const { transactionPresets } = get();
+        const remaining = transactionPresets.filter((preset) => preset.id !== id);
+        if (remaining.length === transactionPresets.length) return;
+
+        set({ transactionPresets: remaining });
+        writeFeatureSnapshot(get());
+      },
+
+      addSavingsGoal: ({ name: inputName, targetAmount }) => {
+        const name = inputName.trim();
+        if (!name || !isPositiveYen(targetAmount)) return;
+
+        const goal: SavingsGoal = { id: uuid(), name, targetAmount, contributions: [], createdAt: Date.now() };
+        set((state) => ({ savingsGoals: [...state.savingsGoals, goal] }));
+        writeFeatureSnapshot(get());
+        return goal;
+      },
+
+      updateSavingsGoal: (id, { name: inputName, targetAmount }) => {
+        const name = inputName.trim();
+        if (!name || !isPositiveYen(targetAmount)) return;
+
+        const { savingsGoals } = get();
+        const goal = savingsGoals.find((item) => item.id === id);
+        if (!goal || (goal.name === name && goal.targetAmount === targetAmount)) return;
+
+        set({ savingsGoals: savingsGoals.map((item) => item.id === id ? { ...item, name, targetAmount } : item) });
+        writeFeatureSnapshot(get());
+      },
+
+      removeSavingsGoal: (id) => {
+        const { savingsGoals } = get();
+        const remaining = savingsGoals.filter((goal) => goal.id !== id);
+        if (remaining.length === savingsGoals.length) return;
+
+        set({ savingsGoals: remaining });
+        writeFeatureSnapshot(get());
+      },
+
+      addSavingsContribution: (goalId, amount) => {
+        if (!isPositiveYen(amount)) return;
+
+        const { savingsGoals } = get();
+        const goal = savingsGoals.find((item) => item.id === goalId);
+        if (!goal) return;
+
+        const savedAmount = goal.contributions.reduce((total, contribution) => total + contribution.amount, 0);
+        if (!Number.isSafeInteger(savedAmount + amount)) return;
+
+        const contribution: SavingsContribution = { id: uuid(), amount, createdAt: Date.now() };
+        set({
+          savingsGoals: savingsGoals.map((item) => item.id === goalId
+            ? { ...item, contributions: [...item.contributions, contribution] }
+            : item),
+        });
+        writeFeatureSnapshot(get());
+      },
+
+      removeSavingsContribution: (goalId, contributionId) => {
+        const { savingsGoals } = get();
+        const goal = savingsGoals.find((item) => item.id === goalId);
+        if (!goal) return;
+
+        const contributions = goal.contributions.filter((contribution) => contribution.id !== contributionId);
+        if (contributions.length === goal.contributions.length) return;
+
+        set({ savingsGoals: savingsGoals.map((item) => item.id === goalId ? { ...item, contributions } : item) });
+        writeFeatureSnapshot(get());
       },
 
       addFixedCost: (input) => {
@@ -292,14 +438,17 @@ export const useBudgetStore = create<BudgetStore>()(
       storage: createJSONStorage(() => localStorage),
       migrate: (persistedState, version): PersistedBudgetState => {
         const state = persistedState as PersistedBudgetState;
-        if (version === 1) return { ...state, dailyBudgetGoals: [], ...initialWardrobe };
-        if (version === 2) return { ...state, ...initialWardrobe };
+        if (version === 1) return { ...state, dailyBudgetGoals: [], ...initialWardrobe, ...readFeatureSnapshot() };
+        if (version === 2) return { ...state, ...initialWardrobe, ...readFeatureSnapshot() };
+        if (version === 3) return { ...state, ...readFeatureSnapshot() };
         return state;
       },
       partialize: (state) => ({
         categories: state.categories,
         transactions: state.transactions,
+        transactionPresets: state.transactionPresets,
         fixedCosts: state.fixedCosts,
+        savingsGoals: state.savingsGoals,
         selectedMonth: state.selectedMonth,
         appliedFixedCostMonths: state.appliedFixedCostMonths,
         dailyBudgetGoals: state.dailyBudgetGoals,
