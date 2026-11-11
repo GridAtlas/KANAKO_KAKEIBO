@@ -5,33 +5,39 @@ import { ArrowRight, CalendarDays, ChevronRight, Flower, NotebookPen, Target, Tr
 import { BudgetDayMark, budgetDayLabel } from "@/components/BudgetDayMark";
 import { BudgetPageHeader } from "@/components/BudgetPageHeader";
 import { MiniKanako } from "@/components/MiniKanako";
+import { WeeklyBudgetCard } from "@/components/WeeklyBudgetCard";
 import { getDailyBudgetMonth, getDailyBudgetStatus, getMiniKanakoStage, type DailyBudgetDay } from "@/lib/dailyBudget";
-import { dateToLocalString, formatDateShort, monthKeyOf, parseMonthKey } from "@/lib/date";
+import { formatDateShort, monthKeyOf } from "@/lib/date";
 import { formatYen } from "@/lib/money";
 import { useDailyBudget } from "@/lib/useDailyBudget";
+import { getWeeklyBudget } from "@/lib/weeklyBudget";
 
 export default function HomePage() {
   const { today, goals, spending } = useDailyBudget();
+  const week = today ? getWeeklyBudget(today, goals, spending) : null;
 
   return (
     <main className="wide-page w-full px-4 pb-8 pt-3 sm:px-6 md:pt-6">
       <BudgetPageHeader dateLabel={today && formatDateShort(today)} />
-      {today ? (
+      {today && week ? (
         <>
           <div className="mt-5 grid gap-4 md:mt-7 md:grid-cols-[1.12fr_1fr] md:gap-5">
             <TodayBudget day={getDailyBudgetStatus(today, today, goals, spending)} />
             <MiniKanako stage={getMiniKanakoStage(today, goals, spending)} hasGoal={goals.length > 0} />
           </div>
-          <div className="mt-4 grid gap-4 md:mt-5 md:grid-cols-[1.12fr_1fr] md:gap-5">
-            <WeekPreview
-              today={today}
-              achieved={getDailyBudgetMonth(monthKeyOf(today), today, goals, spending).filter((day) => day.status === "achieved").length}
-              getDay={(date) => getDailyBudgetStatus(date, today, goals, spending)}
-            />
-            <section className="overflow-hidden rounded-[24px] border border-[#eadccf] bg-[#fffdf9] px-4 sm:px-5" aria-label="家計の振り返り">
-              <HomeAction href="/dashboard" title="月の家計簿" description="収支・支出の内訳" icon={NotebookPen} />
-              <HomeAction href="/trends" title="月ごとの推移" description="6か月の収支・貯金率" icon={TrendingUp} />
-            </section>
+          <div className="mt-4 grid items-start gap-4 md:mt-5 md:grid-cols-[1.12fr_1fr] md:gap-5">
+            <WeeklyBudgetCard week={week} />
+            <div className="grid gap-4 md:gap-5">
+              <WeekPreview
+                today={today}
+                achieved={getDailyBudgetMonth(monthKeyOf(today), today, goals, spending).filter((day) => day.status === "achieved").length}
+                days={week.days}
+              />
+              <section className="overflow-hidden rounded-[24px] border border-[#eadccf] bg-[#fffdf9] px-4 sm:px-5" aria-label="家計の振り返り">
+                <HomeAction href="/dashboard" title="月の家計簿" description="収支・支出の内訳" icon={NotebookPen} />
+                <HomeAction href="/trends" title="月ごとの推移" description="6か月の収支・貯金率" icon={TrendingUp} />
+              </section>
+            </div>
           </div>
         </>
       ) : (
@@ -113,17 +119,12 @@ const WEEKDAYS = ["月", "火", "水", "木", "金", "土", "日"];
 function WeekPreview({
   today,
   achieved,
-  getDay,
+  days,
 }: {
   today: string;
   achieved: number;
-  getDay: (date: string) => DailyBudgetDay;
+  days: DailyBudgetDay[];
 }) {
-  const { year, month } = parseMonthKey(monthKeyOf(today));
-  const dayOfMonth = Number(today.slice(-2));
-  const weekday = new Date(year, month - 1, dayOfMonth).getDay();
-  const monday = dayOfMonth - ((weekday + 6) % 7);
-
   return (
     <section className="min-w-0 rounded-[24px] border border-[#eadccf] bg-[#fffdf9] px-4 pb-4 pt-2 sm:px-5">
       <div className="flex flex-wrap items-center justify-between gap-x-2">
@@ -139,14 +140,12 @@ function WeekPreview({
         </Link>
       </div>
       <ol className="grid grid-cols-7 gap-1" aria-label="今週の記録">
-        {WEEKDAYS.map((name, index) => {
-          const date = dateToLocalString(new Date(year, month - 1, monday + index));
-          const day = getDay(date);
+        {days.map(({ date, status }, index) => {
           return (
-            <li key={name} className="text-center" aria-label={`${formatDateShort(date)} ${budgetDayLabel[day.status]}`}>
-              <div aria-hidden="true" className="text-[11px] font-medium text-[#765b50]">{name}</div>
+            <li key={date} className="text-center" aria-label={`${formatDateShort(date)} ${budgetDayLabel[status]}`}>
+              <div aria-hidden="true" className="text-[11px] font-medium text-[#765b50]">{WEEKDAYS[index]}</div>
               <div aria-hidden="true" className={`mt-1 grid h-9 place-items-center rounded-lg ${date === today ? "border border-[#bc7c6e] bg-[#f9eee5]" : "bg-[#faf4ed]"}`}>
-                <BudgetDayMark status={day.status} />
+                <BudgetDayMark status={status} />
               </div>
             </li>
           );
