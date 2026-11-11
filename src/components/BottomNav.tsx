@@ -16,23 +16,23 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 bg-white/95 border-t border-pink-100 shadow-[0_-8px_24px_rgba(244,114,182,0.12)] backdrop-blur z-30"
+      className="fixed inset-x-0 bottom-0 z-30 border-t border-[#eeded1] bg-[#fffdf8]/95 shadow-[0_-5px_25px_rgba(94,58,33,0.07)] backdrop-blur"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       aria-label="ボトムナビゲーション"
     >
-      <div className="mx-auto max-w-md grid grid-cols-[1fr_1fr_72px_1fr_1fr] items-center relative h-16">
-        <NavItem tab={TABS[0]} active={pathname === "/"} />
+      <div className="relative mx-auto grid h-16 max-w-md grid-cols-[1fr_1fr_62px_2fr] items-center">
+        <NavItem tab={TABS[0]} active={pathname === "/" || pathname === "/calendar" || pathname === "/dashboard" || pathname === "/trends"} />
         <NavItem tab={TABS[1]} active={pathname?.startsWith("/history") ?? false} />
         <div aria-hidden="true" />
-        {/* Center FAB */}
-        <Link
-          href="/add"
-          className="absolute left-1/2 -top-5 -translate-x-1/2 tap-target w-14 h-14 rounded-full bg-pink-500 text-white shadow-lg shadow-pink-200/80 active:bg-pink-600 flex items-center justify-center"
-          aria-label="登録"
-        >
-          <Plus size={28} strokeWidth={2.5} />
-        </Link>
-        <div aria-hidden="true" />
+        {!isAddPage && (
+          <Link
+            href="/add"
+            className="tap-target absolute -top-3 left-1/2 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-2xl bg-[#a13e34] text-white shadow-lg shadow-[#a13e34]/25 transition-colors hover:bg-[#862e28]"
+            aria-label="登録"
+          >
+            <Plus size={28} strokeWidth={2.5} aria-hidden="true" />
+          </Link>
+        )}
         <NavItem
           tab={TABS[2]}
           active={pathname?.startsWith("/settings") ?? false}
@@ -56,11 +56,12 @@ function NavItem({
   return (
     <Link
       href={tab.href}
-      className={`tap-target flex flex-col items-center justify-center gap-0.5 text-[11px] ${
-        active ? "text-pink-600" : "text-stone-500"
+      aria-current={active ? "page" : undefined}
+      className={`tap-target flex flex-col items-center justify-center gap-0.5 whitespace-nowrap rounded-xl px-0.5 text-[10px] font-semibold sm:text-xs ${
+        active ? "text-[#a13e34]" : "text-stone-600 hover:bg-[#f9efe6]"
       }`}
     >
-      <Icon size={22} />
+      <Icon size={21} aria-hidden="true" />
       <span>{tab.label}</span>
     </Link>
   );

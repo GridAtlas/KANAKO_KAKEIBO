@@ -1,10 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronRight, Repeat, Tags, Info } from "lucide-react";
+import { ChevronRight, Repeat, Tags, Info, Target } from "lucide-react";
 
 export default function SettingsPage() {
   const items = [
+    {
+      href: "/settings/daily-budget",
+      icon: Target,
+      label: "1日の支出目標",
+      desc: "今日から使える金額を設定",
+    },
     {
       href: "/settings/categories",
       icon: Tags,

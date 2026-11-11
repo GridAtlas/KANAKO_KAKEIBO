@@ -1,13 +1,14 @@
 import type { Metadata, Viewport } from "next";
+import { AppUpdateNotice } from "@/components/AppUpdateNotice";
 import { BottomNav } from "@/components/BottomNav";
 import "./globals.css";
 
 const assetBasePath = process.env.NODE_ENV === "production" ? "/KANAKO_KAKEIBO" : "";
 
 export const metadata: Metadata = {
-  title: "かなこの家計簿 ver0.2",
+  title: "かなこの家計簿",
   description:
-    "スマホで動く WEB 家計簿アプリ。カテゴリ自由設定、固定費自動計上、円グラフ可視化。",
+    "毎日の予算と支出を記録して、ミニかなこと一緒にはなまるを集める家計簿。",
   applicationName: "かなこの家計簿",
   manifest: `${assetBasePath}/manifest.webmanifest`,
   icons: {
@@ -46,9 +47,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  themeColor: "#f9a8d4",
+  themeColor: "#fff8f0",
 };
 
 export default function RootLayout({
@@ -58,11 +57,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body className="font-sans bg-pink-50 text-stone-900 antialiased">
-        <div className="mx-auto max-w-md min-h-screen flex flex-col relative pb-20">
+      <body className="font-sans text-stone-900 antialiased">
+        <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col pb-24 [&>*:not(.wide-page)]:mx-auto [&>*:not(.wide-page)]:w-full [&>*:not(.wide-page)]:max-w-md">
           {children}
         </div>
         <BottomNav />
+        <AppUpdateNotice />
       </body>
     </html>
   );

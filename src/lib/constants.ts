@@ -35,4 +35,4 @@ export const AVAILABLE_COLORS = [
 ] as const;
 
 export const STORAGE_KEY = "kanako_kakeibo";
-export const STORAGE_VERSION = 1;
+export const STORAGE_VERSION = 2;

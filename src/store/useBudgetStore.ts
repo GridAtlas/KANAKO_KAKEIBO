@@ -13,7 +13,8 @@ import type {
   TransactionInput,
 } from "@/types";
 import { DEFAULT_CATEGORIES, STORAGE_KEY, STORAGE_VERSION } from "@/lib/constants";
-import { currentMonthKey, monthKeyOf } from "@/lib/date";
+import type { DailyBudgetGoal } from "@/lib/dailyBudget";
+import { currentMonthKey, monthKeyOf, todayLocal } from "@/lib/date";
 import { fixedCostToTransactionInput } from "@/lib/fixedCosts";
 
 function uuid(): string {
@@ -38,6 +39,7 @@ interface BudgetStore {
   fixedCosts: FixedCost[];
   selectedMonth: string;
   appliedFixedCostMonths: Record<string, string[]>;
+  dailyBudgetGoals: DailyBudgetGoal[];
 
   // Categories
   addCategory: (input: CategoryInput) => Category;
@@ -58,6 +60,9 @@ interface BudgetStore {
   // Month
   setSelectedMonth: (monthKey: string) => void;
 
+  // Daily budget
+  setDailyBudgetGoal: (amount: number) => void;
+
   // Fixed cost application
   applyFixedCostsForMonth: (monthKey: string) => number;
 
@@ -68,6 +73,11 @@ interface BudgetStore {
   getCategoryById: (id: string) => Category | undefined;
 }
 
+type PersistedBudgetState = Pick<
+  BudgetStore,
+  "categories" | "transactions" | "fixedCosts" | "selectedMonth" | "appliedFixedCostMonths" | "dailyBudgetGoals"
+>;
+
 export const useBudgetStore = create<BudgetStore>()(
   persist(
     (set, get) => ({
@@ -76,6 +86,7 @@ export const useBudgetStore = create<BudgetStore>()(
       fixedCosts: [],
       selectedMonth: currentMonthKey(),
       appliedFixedCostMonths: {},
+      dailyBudgetGoals: [],
 
       addCategory: (input) => {
         const cat: Category = {
@@ -181,6 +192,18 @@ export const useBudgetStore = create<BudgetStore>()(
 
       setSelectedMonth: (monthKey) => set({ selectedMonth: monthKey }),
 
+      setDailyBudgetGoal: (amount) => {
+        if (!Number.isSafeInteger(amount) || amount < 0) return;
+
+        const effectiveFrom = todayLocal();
+        set((state) => ({
+          dailyBudgetGoals: [
+            ...state.dailyBudgetGoals.filter((goal) => goal.effectiveFrom !== effectiveFrom),
+            { effectiveFrom, amount },
+          ].sort((a, b) => a.effectiveFrom.localeCompare(b.effectiveFrom)),
+        }));
+      },
+
       applyFixedCostsForMonth: (monthKey) => {
         const { fixedCosts, appliedFixedCostMonths } = get();
         let count = 0;
@@ -239,12 +262,18 @@ export const useBudgetStore = create<BudgetStore>()(
       name: STORAGE_KEY,
       version: STORAGE_VERSION,
       storage: createJSONStorage(() => localStorage),
+      migrate: (persistedState, version): PersistedBudgetState => {
+        const state = persistedState as PersistedBudgetState;
+        if (version === 1) return { ...state, dailyBudgetGoals: [] };
+        return state;
+      },
       partialize: (state) => ({
         categories: state.categories,
         transactions: state.transactions,
         fixedCosts: state.fixedCosts,
         selectedMonth: state.selectedMonth,
         appliedFixedCostMonths: state.appliedFixedCostMonths,
+        dailyBudgetGoals: state.dailyBudgetGoals,
       }),
     },
   ),

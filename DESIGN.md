@@ -6,7 +6,8 @@
 ┌─────────────────────────────────────────────┐
 │  app/                                       │
 │  ├─ layout.tsx  (BottomNav 含む)            │
-│  ├─ page.tsx        Home                    │
+│  ├─ page.tsx        今日の予算・ミニかなこ    │
+│  ├─ calendar/      はなまるカレンダー        │
 │  ├─ add/page.tsx    登録                    │
 │  ├─ history/        履歴                    │
 │  └─ settings/       カテゴリ / 固定費       │
@@ -18,6 +19,7 @@
 │  store/useBudgetStore.ts (Zustand + persist)│
 │  - categories[], transactions[], fixedCosts │
 │  - selectedMonth, appliedFixedCostMonths    │
+│  - dailyBudgetGoals                         │
 │  - actions: add/update/remove/apply...      │
 │  - selectors: monthly totals, by category   │
 └─────────────────────────────────────────────┘
@@ -38,7 +40,7 @@
                  ↓
       ┌──────────────────────────┐
       │  localStorage            │
-      │  key: kanako_kakeibo:v1  │
+      │  key: kanako_kakeibo     │
       └──────────────────────────┘
 ```
 
@@ -169,12 +171,24 @@ function getMonthlyByCategory(monthKey: string) {
 
 ## モバイル UI 詳細
 
-### Home タイトル / 分析セクション
+### ホーム・日次目標・分析
 
-- Home (`/`) はタイトル画面専用。BottomNav の Home は `TitleHero` を表示する入口とし、タイトル画面のボタンから `/dashboard`（家計簿本体）と `/trends`（月ごとの推移）へ移動する。`TitleHero` は `public/images/kanako-title.jpg` を背景画像として使い、表示タイトルは「かなこの家計簿」、バージョンは小さく `ver0.2` と表示する。
+- ホーム（`/`）に今日の残り予算または超過額、ミニかなこ、今週の判定、今月のはなまる数を表示する。`/dashboard`（月の家計簿）と `/trends`（月ごとの推移）へも移動できる。
+- `/settings/daily-budget` で0円以上の整数を設定する。目標はローカル日付と金額の組を時系列に保存し、設定日から適用する。同日の再設定は上書きする。Zustand の保存形式 v2 は既存の `kanako_kakeibo` キーを使い、v1 のデータに空の目標履歴を追加する。
+- 日次支出は取引の日付ごとに合算し、収入・固定費カテゴリ・固定費から自動生成した取引を除く。目標のある日が目標額以内で終わると、翌日から `/calendar` に達成印を表示する。記録上の支出が0円の日も対象。取引の訂正時は該当日を再集計する。日付を選ぶと当日の目標・支出を見られ、`/history?date=YYYY-MM-DD` に移動できる。
+- ミニかなこは表紙のイラストを参照した5枚の透過 WebP を使用する。最初は中央の段階から始め、日が終わるたびに目標達成で1段階上がり、超過で1段階下がる。当日の超過は暫定で1段階反映する。
 - `MonthlyInsights` は `selectedMonth` を基準に直近 6 か月を `shiftMonthKey` で作り、`getMonthlyTotals(monthKey)` から収入 / 支出 / 収支を算出する。
 - 貯金率は `balance / income * 100`。収入が 0 の月は `--` 表示として、ゼロ除算しない。
 - 月次推移グラフは recharts の `BarChart`。ピンクを支出、グリーンを収入に固定し、データは localStorage 由来の store だけから読む。
+
+<details>
+<summary>ミニかなこの画像生成プロンプト</summary>
+
+表紙の画像を参照に、内蔵 ImageGen で生成した5段階のイラストを `public/images/mini-kanako-0.webp` から `mini-kanako-4.webp` に保存。
+
+> Create a transparent PNG contact sheet of EXACTLY FIVE standalone 3/4-body chibi stickers of the SAME grown Japanese woman, Kanako, for a cheerful Japanese household budget journal app. The attached cover illustration is identity reference only: keep her nearly-black, shoulder-length hair, swept side fringe, large brown eyes, creamy ivory blouse and simple sand-beige apron. Render in a warm, sophisticated Japanese printed storybook / stationery illustration style, clear umber outlines, peach-pink cheeks, light hand-painted texture, soft warm shading, shapes highly legible at 160px. Lay out in ONE horizontal row, five figures centered at exactly 10%, 30%, 50%, 70% and 90% of the width, with generous transparent vertical gutters (minimum 5% of total width between silhouettes) and transparent margin above and below. All figures the same height and not touching each other. Left to right: (1) the roundest soft pear-shaped chibi body and big cheeks, hands on either side of her round apron, puffed-out cheeks, wildly surprised at her shopping total; (2) a slightly round chibi silhouette, holding an open small coin purse, tilted head, sheepish half-smile and one little sweat drop; (3) balanced everyday chibi proportions, cheerful smile, holding a small soft rose-colored budget notebook at waist height; (4) a noticeably slimmer and poised chibi silhouette, smiling with self-confidence, holding a thin pencil near her shoulder and a rose notebook in the other hand; (5) a graceful slim chibi silhouette with polished hair and twinkling eyes, joyfully triumphant raised hand, tiny blush-gold star sparkles closely hugging the upper silhouette. Warm and affectionate character design throughout. Waist-up to upper legs in all five, show hands, include the complete head and apron bottom, softly tapered sticker edges. No scenery, flat ground, rectangular panels, shadows beneath the character, borders, labels, lettering, marks, signs or extra people. Transparent background around every individual sticker. Landscape 3:1 aspect ratio if supported.
+
+</details>
 
 ### PWA アイコン
 
@@ -182,20 +196,21 @@ function getMonthlyByCategory(monthKey: string) {
 - 通常アイコンは `public/icons/kanako-icon-192.png` / `public/icons/kanako-icon-512.png`、maskable は余白多めの `public/icons/kanako-maskable-512.png` を使う。
 - `public/manifest.webmanifest` は GitHub Pages の basePath でも壊れないよう、icon / start_url / scope を相対パスで定義する。`layout.tsx` の metadata では production 時だけ `/KANAKO_KAKEIBO` を付ける。
 
+### 公開版の更新通知
+
+- 本番の静的ビルド時に生成した版の識別子を、クライアントと `version.json` に埋め込む。表示中のクライアントは起動時、画面復帰時、オンライン復帰時、表示中の定期確認で公開中の版と照合する。
+- 新しい版が見つかると確認ダイアログを表示する。「今すぐ更新」で現在のページを再読み込みし、「あとで」で開いているページでの通知を閉じる。家計簿は同じ localStorage キーから読み込む。
+
 ### BottomNav 構造
 
 ```
 ┌─────────────────────────────────────────┐
 │                                         │
-│      [Home]         [History]           │
-│                                         │
-│              [ + FAB ]                  │  ← 浮き出し、中央固定
-│                                         │
-│                     [Settings]          │
+│ [Home] [History]  [+]   [Settings]       │
 └─────────────────────────────────────────┘
 ```
 
-3 タブ + 中央 FAB。FAB は Home/History/Settings 全てで見える。Add ページでは非表示。
+3 タブ + 中央 FAB。ホームの今週の記録からカレンダーへ移動し、FAB から取引の登録画面を開く。登録画面では保存ボタンのため FAB を隠す。
 
 ### 金額入力
 
