@@ -32,21 +32,24 @@ export function ExpensePieChart({ data, monthKey }: { data: CategoryTotal[]; mon
   const pageCount = Math.ceil(chartData.length / categoriesPerPage);
   const page = Math.min(pageIndex, pageCount - 1);
   const first = page * categoriesPerPage;
+  const canRenderChart = typeof ResizeObserver === "function";
 
   return (
     <section aria-label="カテゴリごとの支出" className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-2.5 shadow-[0_5px_16px_rgba(64,38,45,0.05)] sm:p-4">
-      <div className={`grid grid-cols-[6rem_minmax(0,1fr)] items-center gap-2 sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-4 ${pageCount > 1 ? "min-h-[179px]" : ""}`}>
-        <div className="aspect-square min-w-0 rounded-full bg-[#fcf0f2]" aria-hidden="true">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-              <Pie data={chartData} dataKey="value" nameKey="name" innerRadius="57%" outerRadius="94%" paddingAngle={1.5} stroke="#fffcf8" isAnimationActive={false}>
-                {chartData.map(({ id, color }) => (
-                  <Cell key={id} fill={color} />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
+      <div className={`grid items-center gap-2 sm:gap-4 ${canRenderChart ? "grid-cols-[6rem_minmax(0,1fr)] sm:grid-cols-[9rem_minmax(0,1fr)]" : ""} ${pageCount > 1 ? "min-h-[179px]" : ""}`}>
+        {canRenderChart && (
+          <div className="aspect-square min-w-0 rounded-full bg-[#fcf0f2]" aria-hidden="true">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+                <Pie data={chartData} dataKey="value" nameKey="name" innerRadius="57%" outerRadius="94%" paddingAngle={1.5} stroke="#fffcf8" isAnimationActive={false}>
+                  {chartData.map(({ id, color }) => (
+                    <Cell key={id} fill={color} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        )}
         <ul className="min-w-0 divide-y divide-[var(--line)]">
           {chartData.slice(first, first + categoriesPerPage).map(({ id, name, value, color }) => (
             <li key={id}>

@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { BudgetDayMark, budgetDayLabel } from "@/components/BudgetDayMark";
 import { BudgetPageHeader } from "@/components/BudgetPageHeader";
+import { Modal } from "@/components/Modal";
 import { getDailyBudgetMonth, getDailyBudgetStatus, type DailyBudgetDay } from "@/lib/dailyBudget";
 import { formatDateShort, formatMonthLabel, monthKeyOf, parseMonthKey, shiftMonthKey } from "@/lib/date";
 import { formatYen } from "@/lib/money";
@@ -115,7 +116,10 @@ function CalendarGrid({
           <button
             key={day.date}
             type="button"
-            onClick={() => onSelect(day.date)}
+            onClick={(event) => {
+              event.currentTarget.focus();
+              onSelect(day.date);
+            }}
             disabled={day.status === "future"}
             aria-current={isToday ? "date" : undefined}
             aria-haspopup="dialog"
@@ -137,22 +141,13 @@ function CalendarGrid({
 }
 
 function DayDetails({ day, onClose }: { day: DailyBudgetDay; onClose: () => void }) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (dialog && !dialog.open) dialog.showModal();
-  }, []);
-
   return (
-    <dialog ref={dialogRef} onClose={onClose} aria-labelledby="calendar-day-title" className="m-auto w-[92vw] max-w-sm rounded-[22px] border border-[var(--line)] bg-[var(--surface)] p-4 text-[var(--ink)] shadow-xl backdrop:bg-[#40262d]/40 sm:p-5">
+    <Modal onClose={onClose} labelledBy="calendar-day-title" className="rounded-[22px] p-4 sm:p-5">
       <div className="flex items-center justify-between gap-2">
         <h2 id="calendar-day-title" className="text-lg font-extrabold">{formatDateShort(day.date)}</h2>
-        <form method="dialog">
-          <button type="submit" className="tap-target grid place-items-center rounded-lg text-[var(--muted)] hover:bg-[#fbedf0]" aria-label="閉じる">
-            <X size={22} aria-hidden="true" />
-          </button>
-        </form>
+        <button type="button" onClick={onClose} className="tap-target grid place-items-center rounded-lg text-[var(--muted)] hover:bg-[#fbedf0]" aria-label="閉じる">
+          <X size={22} aria-hidden="true" />
+        </button>
       </div>
       <p className="mt-1 flex w-fit items-center gap-1.5 rounded-full bg-[#f9eef0] px-2.5 py-0.5 text-xs font-bold text-[var(--muted)]">
         <BudgetDayMark status={day.status} />
@@ -172,6 +167,6 @@ function DayDetails({ day, onClose }: { day: DailyBudgetDay; onClose: () => void
         この日の履歴を見る
         <ArrowRight size={17} aria-hidden="true" />
       </Link>
-    </dialog>
+    </Modal>
   );
 }

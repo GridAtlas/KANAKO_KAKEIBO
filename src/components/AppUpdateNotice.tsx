@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
+import { Modal } from "./Modal";
 
 const runningVersion = Number(process.env.NEXT_PUBLIC_KANAKO_BUILD_VERSION ?? 0);
 const versionPath = `${process.env.NEXT_PUBLIC_KANAKO_BASE_PATH ?? ""}/version.json`;
 const checkInterval = 5 * 60 * 1000;
 
 export function AppUpdateNotice() {
-  const dialogRef = useRef<HTMLDialogElement>(null);
   const [availableVersion, setAvailableVersion] = useState(0);
   const [dismissedVersion, setDismissedVersion] = useState(0);
 
@@ -60,14 +60,8 @@ export function AppUpdateNotice() {
     };
   }, []);
 
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (availableVersion > dismissedVersion && dialog && !dialog.open) dialog.showModal();
-  }, [availableVersion, dismissedVersion]);
-
   function dismissUpdate() {
     setDismissedVersion(availableVersion);
-    dialogRef.current?.close();
   }
 
   function applyUpdate() {
@@ -76,18 +70,14 @@ export function AppUpdateNotice() {
     window.location.replace(url.href);
   }
 
-  if (!runningVersion) return null;
+  if (availableVersion <= dismissedVersion) return null;
 
   return (
-    <dialog
-      ref={dialogRef}
-      aria-labelledby="app-update-title"
-      aria-describedby="app-update-description"
-      className="m-auto w-[calc(100%-2rem)] max-w-sm rounded-3xl border border-[var(--line)] bg-[var(--surface)] p-5 text-[var(--ink)] shadow-xl backdrop:bg-stone-900/50"
-      onCancel={(event) => {
-        event.preventDefault();
-        dismissUpdate();
-      }}
+    <Modal
+      labelledBy="app-update-title"
+      describedBy="app-update-description"
+      className="rounded-3xl p-5"
+      onClose={dismissUpdate}
     >
       <div className="flex items-center gap-3">
         <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[var(--blush)] text-[var(--accent)]">
@@ -101,7 +91,6 @@ export function AppUpdateNotice() {
       <div className="mt-5 grid grid-cols-2 gap-2">
         <button
           type="button"
-          autoFocus
           className="min-h-11 rounded-xl border border-[var(--line)] bg-white px-2 text-sm font-semibold text-[var(--accent)] hover:bg-[#fcf1f4]"
           onClick={dismissUpdate}
         >
@@ -115,6 +104,6 @@ export function AppUpdateNotice() {
           今すぐ更新
         </button>
       </div>
-    </dialog>
+    </Modal>
   );
 }

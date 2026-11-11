@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { AppUpdateNotice } from "@/components/AppUpdateNotice";
 import { BottomNav } from "@/components/BottomNav";
+import { loadRecoveryScript } from "@/lib/loadRecovery";
 import "./globals.css";
 
 const assetBasePath = process.env.NODE_ENV === "production" ? "/KANAKO_KAKEIBO" : "";
@@ -57,6 +58,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
+      {process.env.NODE_ENV === "production" && (
+        <head>
+          <script dangerouslySetInnerHTML={{ __html: loadRecoveryScript(assetBasePath) }} />
+        </head>
+      )}
       <body className="font-sans text-[var(--ink)] antialiased">
         <div className="app-shell relative mx-auto flex w-full max-w-6xl flex-col [&>*:not(.wide-page)]:mx-auto [&>*:not(.wide-page)]:w-full [&>*:not(.wide-page)]:max-w-md">
           {children}

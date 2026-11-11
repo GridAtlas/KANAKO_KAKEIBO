@@ -29,6 +29,7 @@ export function MonthlyInsights() {
   const expenseDelta = current.expense - previous.expense;
   const averageBalance = rows.reduce((sum, row) => sum + row.balance, 0) / rows.length;
   const expenseSign = expenseDelta > 0 ? "+" : expenseDelta < 0 ? "−" : "";
+  const canRenderChart = typeof ResizeObserver === "function";
 
   return (
     <section aria-label="月ごとの分析" className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-3 text-[var(--ink)] shadow-[0_5px_16px_rgba(64,38,45,0.05)] sm:p-5">
@@ -41,43 +42,46 @@ export function MonthlyInsights() {
         <h2 className="text-sm font-bold">6か月の収入と支出</h2>
         <span className="text-xs font-semibold text-[var(--muted)]">収支 {formatYen(current.balance)}</span>
       </div>
-      <div className="mt-1 flex gap-3 text-xs text-[var(--muted)]">
-        <span className="inline-flex items-center gap-1">
-          <span className="h-2 w-2 rounded-sm" style={{ backgroundColor: incomeColor }} aria-hidden="true" />収入
-        </span>
-        <span className="inline-flex items-center gap-1">
-          <span className="h-2 w-2 rounded-sm" style={{ backgroundColor: expenseColor }} aria-hidden="true" />支出
-        </span>
-      </div>
-      <div className="h-40 md:h-56">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={rows} accessibilityLayer margin={{ top: 6, right: 0, left: 0, bottom: 0 }}>
-            <CartesianGrid stroke="#ecd9dd" strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#755d62" }} />
-            <YAxis hide />
-            <Tooltip
-              trigger="click"
-              isAnimationActive={false}
-              formatter={(value, name) => [formatYen(Number(value)), name === "income" ? "収入" : "支出"]}
-              contentStyle={{ fontSize: 12, borderRadius: 10, borderColor: "var(--line)", background: "var(--surface)" }}
-            />
-            <Bar dataKey="income" fill={incomeColor} radius={[4, 4, 0, 0]} isAnimationActive={false} />
-            <Bar dataKey="expense" fill={expenseColor} radius={[4, 4, 0, 0]} isAnimationActive={false} />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-      <div className="sr-only">
-        <table>
-          <caption>6か月の収入と支出</caption>
-          <thead>
-            <tr><th scope="col">月</th><th scope="col">収入</th><th scope="col">支出</th></tr>
+      {canRenderChart && (
+        <>
+          <div className="mt-1 flex gap-3 text-xs text-[var(--muted)]">
+            <span className="inline-flex items-center gap-1">
+              <span className="h-2 w-2 rounded-sm" style={{ backgroundColor: incomeColor }} aria-hidden="true" />収入
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <span className="h-2 w-2 rounded-sm" style={{ backgroundColor: expenseColor }} aria-hidden="true" />支出
+            </span>
+          </div>
+          <div className="h-40 md:h-56">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={rows} accessibilityLayer margin={{ top: 6, right: 0, left: 0, bottom: 0 }}>
+                <CartesianGrid stroke="#ecd9dd" strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#755d62" }} />
+                <YAxis hide />
+                <Tooltip
+                  trigger="click"
+                  isAnimationActive={false}
+                  formatter={(value, name) => [formatYen(Number(value)), name === "income" ? "収入" : "支出"]}
+                  contentStyle={{ fontSize: 12, borderRadius: 10, borderColor: "var(--line)", background: "var(--surface)" }}
+                />
+                <Bar dataKey="income" fill={incomeColor} radius={[4, 4, 0, 0]} isAnimationActive={false} />
+                <Bar dataKey="expense" fill={expenseColor} radius={[4, 4, 0, 0]} isAnimationActive={false} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </>
+      )}
+      <div className={canRenderChart ? "sr-only" : "mt-2"}>
+        <table aria-label="6か月の収入と支出" className="w-full table-fixed text-right text-xs tabular-nums">
+          <thead className="text-[var(--muted)]">
+            <tr><th className="w-12 text-left" scope="col">月</th><th scope="col">収入</th><th scope="col">支出</th></tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-[var(--line)]">
             {rows.map(({ monthKey, label, income, expense }) => (
               <tr key={monthKey}>
-                <th scope="row">{label}</th>
-                <td>{formatYen(income)}</td>
-                <td>{formatYen(expense)}</td>
+                <th className="py-1 text-left font-medium" scope="row">{label}</th>
+                <td className="break-words">{formatYen(income)}</td>
+                <td className="break-words">{formatYen(expense)}</td>
               </tr>
             ))}
           </tbody>

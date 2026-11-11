@@ -6,6 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: read
   pages: write
   id-token: write
@@ -36,6 +37,20 @@ jobs:
 
       - name: Build (Next.js static export)
         run: npm run build
+
+      - name: Archive current Next.js assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-static-current
+          path: out/_next/static/
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Retain hashed assets from recent deployments
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/retain-next-static.sh
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
