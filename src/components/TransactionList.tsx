@@ -61,7 +61,7 @@ export function TransactionList({ items, emptyText, onItemClick, compact }: Prop
               </div>
             </div>
             <div
-              className={`num font-bold ${compact ? "max-w-[45%] break-all text-right text-sm leading-4" : ""} ${
+              className={`font-bold tabular-nums ${compact ? "max-w-[45%] break-all text-right text-sm leading-4" : ""} ${
                 isIncome ? "text-[var(--sage)]" : "text-[var(--ink)]"
               }`}
             >

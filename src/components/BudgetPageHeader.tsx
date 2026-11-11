@@ -8,7 +8,7 @@ export function BudgetPageHeader({ dateLabel }: { dateLabel?: string }) {
         <span className="grid h-8 w-8 shrink-0 place-items-center rounded-[11px] bg-[var(--blush)] text-[var(--accent)] sm:h-9 sm:w-9">
           <Flower size={20} strokeWidth={1.6} aria-hidden="true" />
         </span>
-        <span className="display-type text-base font-bold tracking-tight sm:text-lg">かなこの家計簿</span>
+        <span className="text-base font-bold tracking-tight sm:text-lg">かなこの家計簿</span>
       </Link>
       {dateLabel && (
         <span className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold tabular-nums text-[var(--muted)] sm:text-sm">

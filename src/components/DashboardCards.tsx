@@ -13,7 +13,7 @@ export function DashboardCards({ totals, fixedExpense, variableExpense }: Props)
       <dl className="grid grid-cols-2 gap-x-3 gap-y-2.5">
         <div className="col-span-2 min-w-0 border-b border-[var(--line)] pb-2">
           <dt className="text-xs font-bold tracking-wide text-[var(--muted)]">支出</dt>
-          <dd className="display-type mt-0.5 break-words text-[clamp(1.9rem,8vw,2.55rem)] font-bold leading-none tracking-tight text-[var(--accent)] tabular-nums">
+          <dd className="mt-0.5 break-words text-[clamp(1.9rem,8vw,2.55rem)] font-bold leading-none tracking-tight text-[var(--accent)] tabular-nums">
             {formatYen(totals.expense)}
           </dd>
         </div>

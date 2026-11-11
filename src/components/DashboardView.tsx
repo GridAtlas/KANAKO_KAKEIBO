@@ -102,7 +102,7 @@ function AnalyticsPage({
       <BudgetPageHeader />
       <div className="mx-auto max-w-xl">
         <div className="flex items-center justify-between gap-2">
-          <h1 className="display-type text-xl font-bold tracking-tight text-[var(--ink)]">{title}</h1>
+          <h1 className="text-xl font-bold tracking-tight text-[var(--ink)]">{title}</h1>
           <Link href={linkHref} className="tap-target inline-flex items-center gap-1.5 rounded-lg px-1.5 text-xs font-bold text-[var(--accent)] hover:bg-[#faedf0] sm:text-sm">
             {linkLabel}
             <ArrowRight size={15} aria-hidden="true" />

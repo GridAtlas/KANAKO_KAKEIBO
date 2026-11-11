@@ -21,7 +21,7 @@ export default function TitlePage() {
         </div>
         <div className="mt-4 flex items-center justify-center gap-2.5 sm:mt-5">
           <Flower size={20} strokeWidth={1.45} className="shrink-0 text-[var(--gold)]" aria-hidden="true" />
-          <h1 className="display-type text-[clamp(1.45rem,6.5vw,2.2rem)] font-bold leading-tight tracking-tight text-[var(--ink)]">
+          <h1 className="text-[clamp(1.45rem,6.5vw,2.2rem)] font-bold leading-tight tracking-tight text-[var(--ink)]">
             かなこの家計簿
           </h1>
         </div>

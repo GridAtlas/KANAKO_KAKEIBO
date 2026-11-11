@@ -272,7 +272,7 @@ function getMonthlyByCategory(monthKey: string) {
   - 支出: `text-rose-600 bg-rose-50 border-rose-200`
   - 収入: `text-emerald-600 bg-emerald-50 border-emerald-200`
   - 固定費バッジ: `text-amber-700 bg-amber-100`
-- フォントはシステムフォント。表紙と見出しの一部に端末の明朝体を使う。
+- 表紙、見出し、本文、金額には共通の日本語ゴシック体を使う。端末のフォントを使い、文字の大きさと太さで見出しを区別する。
 - 金額は `tabular-nums` で桁を揃える。
 
 ## セキュリティ・プライバシー

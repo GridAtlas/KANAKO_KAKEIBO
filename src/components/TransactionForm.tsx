@@ -72,7 +72,7 @@ export function TransactionForm() {
             placeholder="0"
             aria-invalid={invalidAmount || undefined}
             aria-describedby={invalidAmount ? "transaction-amount-error" : undefined}
-            className="num min-h-11 min-w-0 flex-1 bg-transparent text-2xl font-bold tracking-tight text-[#40262d] outline-none placeholder:text-[#755d62]"
+            className="min-h-11 min-w-0 flex-1 bg-transparent text-2xl font-bold tracking-tight tabular-nums text-[#40262d] outline-none placeholder:text-[#755d62]"
           />
         </div>
         {invalidAmount && (

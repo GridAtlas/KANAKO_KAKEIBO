@@ -1,3 +1,5 @@
+import { APP_FONT_FAMILY } from "./typography";
+
 export function loadRecoveryScript(basePath: string): string {
   return `
 (function () {
@@ -17,7 +19,8 @@ export function loadRecoveryScript(basePath: string): string {
 
   function mountRecovery() {
     var panel = document.createElement("div");
-    panel.style.cssText = "position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;padding:16px;box-sizing:border-box;background:#fff8f4;color:#40262d;font:16px system-ui,sans-serif";
+    panel.style.cssText = "position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;padding:16px;box-sizing:border-box;background:#fff8f4;color:#40262d;font-size:16px";
+    panel.style.fontFamily = ${JSON.stringify(APP_FONT_FAMILY)};
     panel.innerHTML =
       '<section role="alertdialog" aria-modal="true" aria-labelledby="kanako-load-title" aria-describedby="kanako-load-message" style="box-sizing:border-box;width:100%;max-width:360px;padding:24px;border:1px solid #ecd9dd;border-radius:20px;background:#fffcf8">' +
       '<h1 id="kanako-load-title" style="margin:0;font-size:20px">家計簿を読み込めませんでした</h1>' +

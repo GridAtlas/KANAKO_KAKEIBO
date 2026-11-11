@@ -1,6 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
+import { APP_FONT_FAMILY } from "@/lib/typography";
 
 const pageStyle: CSSProperties = {
   boxSizing: "border-box",
@@ -11,7 +12,7 @@ const pageStyle: CSSProperties = {
   padding: "24px 16px",
   backgroundColor: "#fff8f4",
   color: "#40262d",
-  fontFamily: '-apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif',
+  fontFamily: APP_FONT_FAMILY,
 };
 
 const cardStyle: CSSProperties = {

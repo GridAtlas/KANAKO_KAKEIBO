@@ -95,7 +95,7 @@ function InsightStat({ label, value, negative }: { label: string; value: string;
   return (
     <div className="min-w-0 px-1">
       <dt className="text-xs text-[var(--muted)]">{label}</dt>
-      <dd className={`display-type mt-0.5 break-words text-base font-bold leading-tight tabular-nums ${negative ? "text-[var(--accent)]" : ""}`}>{value}</dd>
+      <dd className={`mt-0.5 break-words text-base font-bold leading-tight tabular-nums ${negative ? "text-[var(--accent)]" : ""}`}>{value}</dd>
     </div>
   );
 }

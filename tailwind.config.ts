@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import { APP_FONT_FAMILY } from "./src/lib/typography";
 
 const CATEGORY_COLORS = [
   "rose", "red", "orange", "amber", "yellow", "lime", "green", "emerald",
@@ -24,16 +25,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: [
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "Hiragino Sans",
-          "Hiragino Kaku Gothic ProN",
-          "Noto Sans JP",
-          "Meiryo",
-          "system-ui",
-          "sans-serif",
-        ],
+        sans: APP_FONT_FAMILY,
       },
     },
   },

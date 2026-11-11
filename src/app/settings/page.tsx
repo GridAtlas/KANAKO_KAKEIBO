@@ -12,7 +12,7 @@ export default function SettingsPage() {
   return (
     <main className="compact-page flex-1 px-3 py-2 sm:p-5">
       <BudgetPageHeader />
-      <h1 className="display-type my-3 text-xl font-bold text-[var(--ink)]">設定</h1>
+      <h1 className="my-3 text-xl font-bold text-[var(--ink)]">設定</h1>
       <div className="divide-y divide-[#f4e7e7] overflow-hidden rounded-[20px] border border-[var(--line)] bg-[var(--surface)]">
         {settings.map(({ href, icon: Icon, label }) => (
           <Link key={href} href={href} className="tap-target flex items-center gap-3 px-3 py-3 text-sm font-bold text-[var(--ink)] hover:bg-[#fcf1f4]">

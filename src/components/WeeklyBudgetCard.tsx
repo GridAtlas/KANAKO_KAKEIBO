@@ -12,7 +12,7 @@ export function WeeklyBudgetCard({ week }: { week: WeeklyBudget }) {
   return (
     <section aria-labelledby="weekly-budget-title" className="min-w-0 rounded-[24px] border border-[#d9e3d7] bg-[linear-gradient(155deg,#f0f5ec_0%,var(--surface)_58%)] p-4 text-[var(--ink)] shadow-[0_6px_20px_rgba(64,38,45,0.06)] sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
-        <h1 id="weekly-budget-title" className="display-type flex items-center gap-1.5 text-lg font-bold">
+        <h1 id="weekly-budget-title" className="flex items-center gap-1.5 text-lg font-bold">
           <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-[#e2ece0] text-[var(--sage)]" aria-hidden="true">
             <CalendarRange size={16} strokeWidth={1.7} />
           </span>
@@ -36,7 +36,7 @@ export function WeeklyBudgetCard({ week }: { week: WeeklyBudget }) {
         <>
           <div className={`mt-3 ${over ? "text-[var(--accent)]" : "text-[var(--sage)]"}`}>
             <p className="text-xs font-bold tracking-wide">{over ? "今週の予算超過" : "今週の残り予算"}</p>
-            <p className="display-type mt-1 break-words text-[clamp(2.15rem,8vw,2.85rem)] font-bold leading-none tracking-tight tabular-nums">
+            <p className="mt-1 break-words text-[clamp(2.15rem,8vw,2.85rem)] font-bold leading-none tracking-tight tabular-nums">
               {formatYen(Math.abs(remaining))}
             </p>
           </div>
