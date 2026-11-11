@@ -5,15 +5,15 @@ import { usePathname } from "next/navigation";
 import { Home, List, Plus, Settings } from "lucide-react";
 
 const TABS = [
-  { href: "/", label: "ホーム", icon: Home },
+  { href: "/today", label: "ホーム", icon: Home },
   { href: "/history", label: "履歴", icon: List },
   { href: "/settings", label: "設定", icon: Settings },
 ];
-const HOME_ROUTES = ["/", "/calendar", "/dashboard", "/trends", "/wardrobe"];
+const HOME_ROUTES = ["/", "/today", "/calendar", "/dashboard", "/trends", "/wardrobe", "/weekly"];
 
 export function BottomNav() {
-  const pathname = usePathname();
-  const isAddPage = pathname?.startsWith("/add") ?? false;
+  const pathname = usePathname()?.replace(/\/$/, "") || "/";
+  const isAddPage = pathname === "/add";
 
   return (
     <nav
@@ -22,13 +22,13 @@ export function BottomNav() {
       aria-label="ボトムナビゲーション"
     >
       <div className="relative mx-auto grid h-16 max-w-md grid-cols-[1fr_1fr_62px_2fr] items-center">
-        <NavItem tab={TABS[0]} active={HOME_ROUTES.includes(pathname ?? "")} />
-        <NavItem tab={TABS[1]} active={pathname?.startsWith("/history") ?? false} />
+        <NavItem tab={TABS[0]} active={HOME_ROUTES.includes(pathname)} />
+        <NavItem tab={TABS[1]} active={pathname === "/history"} />
         <div aria-hidden="true" />
         {!isAddPage && (
           <Link
             href="/add"
-            className="tap-target absolute -top-3 left-1/2 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-2xl bg-[#a13e34] text-white shadow-lg shadow-[#a13e34]/25 transition-colors hover:bg-[#862e28]"
+            className="tap-target absolute left-1/2 top-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-xl bg-[#a13e34] text-white hover:bg-[#862e28]"
             aria-label="登録"
           >
             <Plus size={28} strokeWidth={2.5} aria-hidden="true" />
@@ -36,7 +36,7 @@ export function BottomNav() {
         )}
         <NavItem
           tab={TABS[2]}
-          active={pathname?.startsWith("/settings") ?? false}
+          active={pathname.startsWith("/settings")}
         />
       </div>
       {isAddPage && (

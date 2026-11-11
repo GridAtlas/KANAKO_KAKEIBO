@@ -58,7 +58,7 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className="font-sans text-stone-900 antialiased">
-        <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col pb-24 [&>*:not(.wide-page)]:mx-auto [&>*:not(.wide-page)]:w-full [&>*:not(.wide-page)]:max-w-md">
+        <div className="app-shell relative mx-auto flex w-full max-w-6xl flex-col [&>*:not(.wide-page)]:mx-auto [&>*:not(.wide-page)]:w-full [&>*:not(.wide-page)]:max-w-md">
           {children}
         </div>
         <BottomNav />

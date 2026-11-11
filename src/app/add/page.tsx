@@ -6,18 +6,18 @@ import { TransactionForm } from "@/components/TransactionForm";
 
 export default function AddPage() {
   return (
-    <>
-      <header className="sticky top-0 bg-white/90 border-b border-pink-100 px-3 py-3 flex items-center gap-2 z-20">
+    <main className="compact-page w-full px-3 pb-2 pt-2 sm:px-5">
+      <header className="flex min-h-12 items-center gap-1 border-b border-[#eadccf]">
         <Link
-          href="/"
-          className="tap-target -ml-1 p-1 text-stone-500"
+          href="/today"
+          className="tap-target -ml-1 inline-flex items-center justify-center rounded-lg text-[#983e34] hover:bg-[#faf2ea]"
           aria-label="戻る"
         >
-          <ArrowLeft size={22} />
+          <ArrowLeft size={21} aria-hidden="true" />
         </Link>
-        <h1 className="font-semibold text-stone-700">登録</h1>
+        <h1 className="text-lg font-bold text-[#3b2721]">取引を登録</h1>
       </header>
       <TransactionForm />
-    </>
+    </main>
   );
 }

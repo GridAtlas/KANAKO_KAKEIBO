@@ -12,18 +12,18 @@ export default function DailyBudgetSettingsPage() {
   const { today, goals, spending } = useDailyBudget();
 
   return (
-    <main className="flex-1 px-4 pb-8 pt-3 sm:pt-6">
+    <main className="compact-page flex-1 px-3 py-2 sm:p-5">
       <Link href="/settings" className="tap-target inline-flex items-center gap-1.5 rounded-lg text-sm font-bold text-[#983e34] hover:underline">
         <ArrowLeft size={17} aria-hidden="true" />
         設定へ
       </Link>
-      <section className="mt-2 rounded-[24px] border border-[#eadccf] bg-[#fffdf9] p-5 sm:p-6">
+      <section className="mt-2 rounded-[20px] border border-[#eadccf] bg-[#fffdf9] p-4 sm:p-5">
         <h1 className="flex items-center gap-2 text-xl font-bold text-[#3b2721]">
           <Target size={21} className="text-[#a13e34]" aria-hidden="true" />
           1日の支出目標
         </h1>
-        <p id="goal-help" className="mb-5 mt-2 text-sm leading-relaxed text-[#765b50]">
-          固定費を除いて、1日にいくらまで使うか決めましょう。変更は今日から反映されます。
+        <p id="goal-help" className="mb-3 mt-2 text-sm leading-relaxed text-[#765b50]">
+          固定費を除いた支出の目標です。今日から適用します。
         </p>
         {today ? (
           <DailyBudgetForm currentGoal={getDailyBudgetStatus(today, today, goals, spending).goal} />
@@ -50,7 +50,7 @@ function DailyBudgetForm({ currentGoal }: { currentGoal: number | null }) {
       return;
     }
     setGoal(amount);
-    router.push("/");
+    router.push("/today");
   }
 
   return (
@@ -76,7 +76,7 @@ function DailyBudgetForm({ currentGoal }: { currentGoal: number | null }) {
         <span className="text-sm font-bold text-[#765b50]">円</span>
       </div>
       {error && <p id="goal-error" role="alert" className="mt-2 text-sm font-semibold text-[#a13e34]">0円以上の整数を入力してください。</p>}
-      <button type="submit" className="tap-target mt-5 w-full rounded-xl bg-[#a13e34] px-4 py-3 text-sm font-bold text-white hover:bg-[#862e28]">
+      <button type="submit" className="tap-target mt-4 w-full rounded-xl bg-[#a13e34] px-4 text-sm font-bold text-white hover:bg-[#862e28]">
         今日からこの目標にする
       </button>
     </form>

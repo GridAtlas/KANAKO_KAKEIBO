@@ -2,16 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
-html,
-body {
-  height: 100%;
-}
-
 body {
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: contain;
-  padding-bottom: env(safe-area-inset-bottom);
   background: #fff8f0;
+}
+
+.app-shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-bottom: calc(4rem + 1px + env(safe-area-inset-bottom));
+}
+
+.app-shell > .wide-page.compact-page {
+  max-width: 42rem;
+  margin-inline: auto;
 }
 
 /* iOS Safari の input zoom 防止: 16px 以上 */

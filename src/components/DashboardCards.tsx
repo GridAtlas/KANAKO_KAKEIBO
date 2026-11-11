@@ -1,5 +1,3 @@
-"use client";
-
 import { formatYen } from "@/lib/money";
 import type { MonthlyTotals } from "@/types";
 
@@ -11,48 +9,38 @@ interface Props {
 
 export function DashboardCards({ totals, fixedExpense, variableExpense }: Props) {
   return (
-    <div className="space-y-3">
-      {/* 大きな月合計 */}
-      <div className="rounded-2xl bg-white/90 p-4 border border-pink-100 shadow-sm shadow-pink-100/60">
-        <div className="text-xs text-stone-500 mb-1">今月の支出</div>
-        <div className="num text-3xl font-bold text-rose-600">
-          {formatYen(totals.expense)}
+    <section aria-label="月の収支" className="rounded-2xl border border-[#eadccf] bg-[#fffdf8] px-3.5 py-3 text-[#3b2721] sm:px-5">
+      <dl className="grid grid-cols-2 gap-x-3 gap-y-2.5">
+        <div className="col-span-2 min-w-0 border-b border-[#eadccf] pb-2">
+          <dt className="text-xs font-semibold text-[#765b50]">支出</dt>
+          <dd className="break-words text-[clamp(1.55rem,7vw,2rem)] font-bold leading-none tracking-tight text-[#a13e34] tabular-nums">
+            {formatYen(totals.expense)}
+          </dd>
         </div>
-        <div className="mt-2 flex gap-4 text-xs">
-          <div>
-            <span className="text-stone-500">固定 </span>
-            <span className="num font-semibold">
-              {formatYen(fixedExpense)}
-            </span>
-          </div>
-          <div>
-            <span className="text-stone-500">変動 </span>
-            <span className="num font-semibold">
-              {formatYen(variableExpense)}
-            </span>
-          </div>
-        </div>
-      </div>
+        <SummaryValue label="固定費" amount={fixedExpense} />
+        <SummaryValue label="変動費" amount={variableExpense} />
+        <SummaryValue label="収入" amount={totals.income} tone="income" />
+        <SummaryValue label="収支" amount={totals.balance} tone={totals.balance < 0 ? "expense" : "income"} />
+      </dl>
+    </section>
+  );
+}
 
-      {/* 収入 / 収支 */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-2xl bg-white/90 p-3 border border-pink-100 shadow-sm shadow-pink-100/60">
-          <div className="text-xs text-stone-500 mb-1">今月の収入</div>
-          <div className="num text-xl font-bold text-emerald-600">
-            {formatYen(totals.income)}
-          </div>
-        </div>
-        <div className="rounded-2xl bg-white/90 p-3 border border-pink-100 shadow-sm shadow-pink-100/60">
-          <div className="text-xs text-stone-500 mb-1">収支</div>
-          <div
-            className={`num text-xl font-bold ${
-              totals.balance >= 0 ? "text-emerald-600" : "text-rose-600"
-            }`}
-          >
-            {formatYen(totals.balance)}
-          </div>
-        </div>
-      </div>
+function SummaryValue({
+  label,
+  amount,
+  tone,
+}: {
+  label: string;
+  amount: number;
+  tone?: "income" | "expense";
+}) {
+  const color = tone === "income" ? "text-[#3a6543]" : tone === "expense" ? "text-[#a13e34]" : "";
+
+  return (
+    <div className="min-w-0">
+      <dt className="text-xs text-[#765b50]">{label}</dt>
+      <dd className={`break-words text-sm font-bold tabular-nums ${color}`}>{formatYen(amount)}</dd>
     </div>
   );
 }

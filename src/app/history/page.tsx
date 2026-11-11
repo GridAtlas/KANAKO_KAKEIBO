@@ -2,10 +2,14 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useBudgetStore } from "@/store/useBudgetStore";
 import { TransactionList } from "@/components/TransactionList";
 import { MonthSwitcher } from "@/components/MonthSwitcher";
 import { daysInMonth, formatDateShort, monthKeyOf } from "@/lib/date";
+import type { Transaction } from "@/types";
+
+const MOBILE_PAGE_SIZE = 4;
 
 function readMonth(value: string | null): string | null {
   return value && /^(?!0000)\d{4}-(0[1-9]|1[0-2])$/.test(value) ? value : null;
@@ -32,8 +36,14 @@ export default function HistoryPage() {
 
 function HistoryContent() {
   const searchParams = useSearchParams();
-  const [hydrated, setHydrated] = useState(false);
-  useEffect(() => setHydrated(true), []);
+  const [compact, setCompact] = useState<boolean>();
+  useEffect(() => {
+    const viewport = window.matchMedia("(max-width: 639px)");
+    const update = () => setCompact(viewport.matches);
+    update();
+    viewport.addEventListener("change", update);
+    return () => viewport.removeEventListener("change", update);
+  }, []);
 
   const selectedMonth = useBudgetStore((s) => s.selectedMonth);
   const setSelectedMonth = useBudgetStore((s) => s.setSelectedMonth);
@@ -73,21 +83,21 @@ function HistoryContent() {
     replaceQuery(params);
   }
 
-  if (!hydrated) return <HistoryLoading />;
+  if (compact === undefined) return <HistoryLoading />;
 
   return (
-    <div className="flex-1 p-3 space-y-3">
-      <header className="sticky top-0 bg-pink-50/95 pb-2 z-10">
-        <h1 className="font-semibold text-stone-700 px-1 mb-1">履歴</h1>
+    <main className="compact-page flex-1 space-y-1.5 px-3 py-2 sm:space-y-3 sm:px-4 sm:py-4">
+      <header>
+        <h1 className="px-1 text-lg font-bold text-[#3b2721]">履歴</h1>
         <MonthSwitcher monthKey={monthKey} onMonthChange={changeMonth} />
       </header>
 
       {date && (
-        <div className="flex items-center justify-between gap-2 rounded-xl border border-pink-100 bg-pink-100/60 px-3 text-sm">
-          <span className="font-semibold text-stone-700">{formatDateShort(date)}の履歴</span>
+        <div className="flex items-center justify-between gap-2 rounded-xl border border-[#eadccf] bg-[#f7ede4] px-3 text-sm">
+          <span className="font-semibold text-[#3b2721]">{formatDateShort(date)}の履歴</span>
           <button
             type="button"
-            className="min-h-11 shrink-0 font-semibold text-pink-700 underline underline-offset-4"
+            className="tap-target shrink-0 text-sm font-semibold text-[#983e34] underline underline-offset-4"
             onClick={() => changeMonth(monthKey)}
           >
             月全体を表示
@@ -99,7 +109,7 @@ function HistoryContent() {
         aria-label="カテゴリで絞り込み"
         value={categoryFilter}
         onChange={(e) => changeCategory(e.target.value)}
-        className="min-h-11 w-full rounded-xl border border-pink-100 px-3 py-2 bg-white/90"
+        className="min-h-11 w-full rounded-xl border border-[#eadccf] bg-[#fffdf9] px-3 py-2"
       >
         <option value="">すべてのカテゴリ</option>
         {[...categories]
@@ -111,10 +121,58 @@ function HistoryContent() {
           ))}
       </select>
 
-      <TransactionList
+      <HistoryTransactions
+        key={JSON.stringify([monthKey, date, categoryFilter])}
         items={filtered}
         emptyText={date ? "この日の取引はありません" : "この月の取引はありません"}
+        compact={compact}
       />
+    </main>
+  );
+}
+
+function HistoryTransactions({ items, emptyText, compact }: {
+  items: Transaction[];
+  emptyText: string;
+  compact: boolean;
+}) {
+  const [requestedPage, setRequestedPage] = useState(0);
+  const pageCount = Math.ceil(items.length / MOBILE_PAGE_SIZE);
+  const page = Math.min(requestedPage, Math.max(0, pageCount - 1));
+  const pageStart = page * MOBILE_PAGE_SIZE;
+
+  return (
+    <div className="space-y-1.5">
+      <TransactionList
+        items={compact ? items.slice(pageStart, pageStart + MOBILE_PAGE_SIZE) : items}
+        emptyText={emptyText}
+        compact={compact}
+      />
+      {compact && pageCount > 1 && (
+        <div className="flex items-center justify-center gap-2" role="group" aria-label="履歴のページ切り替え">
+          <button
+            type="button"
+            className="tap-target grid place-items-center rounded-lg text-[#983e34] enabled:hover:bg-[#f7ede4] disabled:text-[#bda99b]"
+            aria-label="前の履歴ページ"
+            disabled={page === 0}
+            onClick={() => setRequestedPage(page - 1)}
+          >
+            <ChevronLeft size={20} aria-hidden="true" />
+          </button>
+          <span className="min-w-12 text-center text-xs font-semibold tabular-nums text-[#765b50]" aria-live="polite">
+            {page + 1} / {pageCount}
+          </span>
+          <button
+            type="button"
+            className="tap-target grid place-items-center rounded-lg text-[#983e34] enabled:hover:bg-[#f7ede4] disabled:text-[#bda99b]"
+            aria-label="次の履歴ページ"
+            disabled={page === pageCount - 1}
+            onClick={() => setRequestedPage(page + 1)}
+          >
+            <ChevronRight size={20} aria-hidden="true" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

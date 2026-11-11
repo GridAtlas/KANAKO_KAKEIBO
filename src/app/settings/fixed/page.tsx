@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Pencil, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Pencil, Plus } from "lucide-react";
 import { useBudgetStore } from "@/store/useBudgetStore";
 import { getIcon } from "@/lib/icons";
 import { FixedCostForm } from "@/components/FixedCostForm";
 import { formatYen } from "@/lib/money";
+import { SettingsListPager } from "@/components/SettingsListPager";
 import type { FixedCost } from "@/types";
+
+const PAGE_SIZE = 5;
 
 export default function FixedPage() {
   const [hydrated, setHydrated] = useState(false);
@@ -19,109 +22,82 @@ export default function FixedPage() {
 
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<FixedCost | null>(null);
+  const [requestedPage, setRequestedPage] = useState(0);
+  const pages = Math.max(1, Math.ceil(fixedCosts.length / PAGE_SIZE));
+  const page = Math.min(requestedPage, pages - 1);
+  const visible = fixedCosts.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+  const closeForm = () => {
+    setShowForm(false);
+    setEditing(null);
+  };
 
   return (
-    <div className="flex-1 p-3 pb-32 space-y-3">
-      <header className="sticky top-0 bg-pink-50/95 pb-2 z-10 flex items-center gap-2 pt-1">
+    <main className="compact-page flex-1 space-y-2 px-3 py-2">
+      <header className="flex min-h-12 items-center gap-1 border-b border-[#eadccf]">
         <Link
           href="/settings"
-          className="tap-target -ml-1 p-1 text-stone-500"
-          aria-label="戻る"
+          className="tap-target grid place-items-center rounded-lg text-[#983e34] hover:bg-[#f4e7dc]"
+          aria-label="設定へ戻る"
         >
           <ArrowLeft size={22} />
         </Link>
-        <h1 className="font-semibold text-stone-700">固定費の設定</h1>
+        <h1 className="font-bold text-[#3b2721]">固定費の設定</h1>
       </header>
 
       {!hydrated ? (
         <div className="text-center text-sm text-stone-400 py-6">読み込み中…</div>
       ) : showForm || editing ? (
-        <div className="rounded-2xl bg-white/90 border border-pink-100 p-3">
+        <section className="rounded-[20px] border border-[#eadccf] bg-[#fffdf9] p-3" aria-label={editing ? "固定費を編集" : "固定費を追加"}>
           <FixedCostForm
             initial={editing ?? undefined}
             onSubmit={() => {
-              setShowForm(false);
-              setEditing(null);
+              if (!editing) setRequestedPage(Math.floor(fixedCosts.length / PAGE_SIZE));
+              closeForm();
             }}
-            onCancel={() => {
-              setShowForm(false);
-              setEditing(null);
-            }}
+            onCancel={closeForm}
+            onDelete={editing ? () => {
+              if (confirm("この固定費設定を削除しますか？")) {
+                removeFixedCost(editing.id);
+                closeForm();
+              }
+            } : undefined}
           />
-        </div>
+        </section>
       ) : (
-        <button
-          type="button"
-          onClick={() => setShowForm(true)}
-          className="tap-target w-full inline-flex items-center justify-center gap-1 rounded-xl bg-pink-500 text-white py-3 font-semibold active:bg-pink-600"
-        >
-          <Plus size={18} />
-          <span>固定費を追加</span>
-        </button>
-      )}
-
-      {fixedCosts.length === 0 ? (
-        <div className="rounded-2xl bg-white/90 border border-pink-100 p-6 text-center text-sm text-stone-400">
-          まだ固定費はありません
-        </div>
-      ) : (
-        <div className="rounded-2xl bg-white/90 border border-pink-100 overflow-hidden divide-y divide-pink-50">
-          {fixedCosts.map((f) => {
-            const cat = getCategoryById(f.categoryId);
-            const Icon = getIcon(cat?.icon ?? "HelpCircle");
-            const color = cat?.color ?? "slate";
-            return (
-              <div key={f.id} className="flex items-center gap-3 px-3 py-2.5">
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center bg-${color}-100 text-${color}-700 ${
-                    !f.active ? "opacity-40" : ""
-                  }`}
-                >
-                  <Icon size={20} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold truncate">
-                      {f.label || cat?.name || "—"}
-                    </span>
-                    {!f.active && (
-                      <span className="text-[10px] bg-pink-100 text-stone-600 px-1 rounded">
-                        停止
+        <>
+          <button type="button" onClick={() => setShowForm(true)} className="tap-target flex w-full items-center justify-center gap-1 rounded-xl bg-[#a13e34] px-3 text-sm font-bold text-white hover:bg-[#862e28]">
+            <Plus size={18} aria-hidden="true" />
+            固定費を追加
+          </button>
+          {visible.length ? (
+            <ul className="divide-y divide-[#f0e5db] overflow-hidden rounded-[20px] border border-[#eadccf] bg-[#fffdf9]" aria-label="固定費">
+              {visible.map((fixed) => {
+                const category = getCategoryById(fixed.categoryId);
+                const Icon = getIcon(category?.icon ?? "HelpCircle");
+                const color = category?.color ?? "slate";
+                return (
+                  <li key={fixed.id}>
+                    <button type="button" onClick={() => setEditing(fixed)} className="tap-target flex min-h-12 w-full items-center gap-2 px-2 text-left hover:bg-[#faf2ea]">
+                      <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-${color}-100 text-${color}-700`}>
+                        <Icon size={17} aria-hidden="true" />
                       </span>
-                    )}
-                  </div>
-                  <div className="text-xs text-stone-500">
-                    {cat?.name ?? "削除済カテゴリ"} · 毎月 {f.paymentDay} 日
-                  </div>
-                </div>
-                <div className="num font-bold text-stone-900">
-                  {formatYen(f.amount)}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setEditing(f)}
-                  className="tap-target p-1 text-stone-500"
-                  aria-label="編集"
-                >
-                  <Pencil size={18} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (confirm("この固定費設定を削除しますか？")) {
-                      removeFixedCost(f.id);
-                    }
-                  }}
-                  className="tap-target p-1 text-stone-400 active:text-rose-600"
-                  aria-label="削除"
-                >
-                  <Trash2 size={18} />
-                </button>
-              </div>
-            );
-          })}
-        </div>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-bold text-[#3b2721]">{fixed.label || category?.name || "削除済カテゴリ"}</span>
+                        <span className="block text-xs text-[#765b50]">毎月{fixed.paymentDay}日{!fixed.active && "・停止中"}</span>
+                      </span>
+                      <span className="max-w-[42%] break-all text-right text-sm font-bold tabular-nums">{formatYen(fixed.amount)}</span>
+                      <Pencil size={14} className="shrink-0 text-[#765b50]" aria-hidden="true" />
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <p className="px-1 py-2 text-sm text-[#765b50]">固定費はまだありません。</p>
+          )}
+          <SettingsListPager page={page} pages={pages} onChange={setRequestedPage} />
+        </>
       )}
-    </div>
+    </main>
   );
 }
