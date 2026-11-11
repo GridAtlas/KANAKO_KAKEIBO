@@ -16,6 +16,7 @@ import { DEFAULT_CATEGORIES, STORAGE_KEY, STORAGE_VERSION } from "@/lib/constant
 import type { DailyBudgetGoal } from "@/lib/dailyBudget";
 import { currentMonthKey, monthKeyOf, todayLocal } from "@/lib/date";
 import { fixedCostToTransactionInput } from "@/lib/fixedCosts";
+import { DEFAULT_OUTFIT, getUnlockedOutfits, type OutfitId } from "@/lib/wardrobe";
 
 function uuid(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -40,6 +41,8 @@ interface BudgetStore {
   selectedMonth: string;
   appliedFixedCostMonths: Record<string, string[]>;
   dailyBudgetGoals: DailyBudgetGoal[];
+  unlockedOutfits: OutfitId[];
+  activeOutfit: OutfitId;
 
   // Categories
   addCategory: (input: CategoryInput) => Category;
@@ -63,6 +66,9 @@ interface BudgetStore {
   // Daily budget
   setDailyBudgetGoal: (amount: number) => void;
 
+  // Wardrobe
+  updateWardrobe: (longestStreak: number, outfit?: OutfitId) => void;
+
   // Fixed cost application
   applyFixedCostsForMonth: (monthKey: string) => number;
 
@@ -75,8 +81,20 @@ interface BudgetStore {
 
 type PersistedBudgetState = Pick<
   BudgetStore,
-  "categories" | "transactions" | "fixedCosts" | "selectedMonth" | "appliedFixedCostMonths" | "dailyBudgetGoals"
+  | "categories"
+  | "transactions"
+  | "fixedCosts"
+  | "selectedMonth"
+  | "appliedFixedCostMonths"
+  | "dailyBudgetGoals"
+  | "unlockedOutfits"
+  | "activeOutfit"
 >;
+
+const initialWardrobe: Pick<PersistedBudgetState, "unlockedOutfits" | "activeOutfit"> = {
+  unlockedOutfits: [DEFAULT_OUTFIT],
+  activeOutfit: DEFAULT_OUTFIT,
+};
 
 export const useBudgetStore = create<BudgetStore>()(
   persist(
@@ -87,6 +105,7 @@ export const useBudgetStore = create<BudgetStore>()(
       selectedMonth: currentMonthKey(),
       appliedFixedCostMonths: {},
       dailyBudgetGoals: [],
+      ...initialWardrobe,
 
       addCategory: (input) => {
         const cat: Category = {
@@ -204,6 +223,15 @@ export const useBudgetStore = create<BudgetStore>()(
         }));
       },
 
+      updateWardrobe: (longestStreak, outfit) => {
+        const { unlockedOutfits, activeOutfit } = get();
+        const availableOutfits = getUnlockedOutfits(longestStreak, unlockedOutfits);
+        const selection = outfit && availableOutfits.includes(outfit) ? outfit : activeOutfit;
+        if (availableOutfits.length === unlockedOutfits.length && selection === activeOutfit) return;
+
+        set({ unlockedOutfits: availableOutfits, activeOutfit: selection });
+      },
+
       applyFixedCostsForMonth: (monthKey) => {
         const { fixedCosts, appliedFixedCostMonths } = get();
         let count = 0;
@@ -264,7 +292,8 @@ export const useBudgetStore = create<BudgetStore>()(
       storage: createJSONStorage(() => localStorage),
       migrate: (persistedState, version): PersistedBudgetState => {
         const state = persistedState as PersistedBudgetState;
-        if (version === 1) return { ...state, dailyBudgetGoals: [] };
+        if (version === 1) return { ...state, dailyBudgetGoals: [], ...initialWardrobe };
+        if (version === 2) return { ...state, ...initialWardrobe };
         return state;
       },
       partialize: (state) => ({
@@ -274,6 +303,8 @@ export const useBudgetStore = create<BudgetStore>()(
         selectedMonth: state.selectedMonth,
         appliedFixedCostMonths: state.appliedFixedCostMonths,
         dailyBudgetGoals: state.dailyBudgetGoals,
+        unlockedOutfits: state.unlockedOutfits,
+        activeOutfit: state.activeOutfit,
       }),
     },
   ),

@@ -9,6 +9,7 @@ const TABS = [
   { href: "/history", label: "履歴", icon: List },
   { href: "/settings", label: "設定", icon: Settings },
 ];
+const HOME_ROUTES = ["/", "/calendar", "/dashboard", "/trends", "/wardrobe"];
 
 export function BottomNav() {
   const pathname = usePathname();
@@ -21,7 +22,7 @@ export function BottomNav() {
       aria-label="ボトムナビゲーション"
     >
       <div className="relative mx-auto grid h-16 max-w-md grid-cols-[1fr_1fr_62px_2fr] items-center">
-        <NavItem tab={TABS[0]} active={pathname === "/" || pathname === "/calendar" || pathname === "/dashboard" || pathname === "/trends"} />
+        <NavItem tab={TABS[0]} active={HOME_ROUTES.includes(pathname ?? "")} />
         <NavItem tab={TABS[1]} active={pathname?.startsWith("/history") ?? false} />
         <div aria-hidden="true" />
         {!isAddPage && (

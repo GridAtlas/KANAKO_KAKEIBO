@@ -73,31 +73,45 @@ export function getDailyBudgetMonth(
   });
 }
 
+export function* getCompletedDailyBudgetOutcomes(
+  today: string,
+  goals: readonly DailyBudgetGoal[],
+  spending: ReadonlyMap<string, number>,
+): Generator<"achieved" | "over"> {
+  const start = goals[0]?.effectiveFrom;
+  if (!start || start >= today) return;
+
+  // 日付をローカル時刻で進め、夏時間で一日が 24 時間にならない地域にも対応する。
+  const [year, month, day] = start.split("-").map(Number);
+  const cursor = new Date(year, month - 1, day, 12);
+  let goalIndex = 0;
+
+  for (let date = start; date < today; date = dateToLocalString(cursor)) {
+    while (goals[goalIndex + 1] && goals[goalIndex + 1].effectiveFrom <= date) goalIndex++;
+
+    const amount = spending.get(date) ?? 0;
+    yield amount > goals[goalIndex].amount ? "over" : "achieved";
+    cursor.setDate(cursor.getDate() + 1);
+  }
+}
+
 export function getMiniKanakoStage(
   today: string,
   goals: readonly DailyBudgetGoal[],
   spending: ReadonlyMap<string, number>,
 ): MiniKanakoStage {
-  const start = goals[0]?.effectiveFrom;
-  if (!start) return 0;
-
-  // 日付をローカル時刻で進め、夏時間で一日が 24 時間にならない地域にも対応する。
-  const [year, month, day] = start.split("-").map(Number);
-  const cursor = new Date(year, month - 1, day, 12);
   let stageIndex = 2;
-  let goalIndex = 0;
 
-  for (let date = start; date <= today; date = dateToLocalString(cursor)) {
-    if (goals[goalIndex + 1]?.effectiveFrom === date) goalIndex++;
-
-    const amount = spending.get(date) ?? 0;
-    if (amount > goals[goalIndex].amount) {
+  for (const outcome of getCompletedDailyBudgetOutcomes(today, goals, spending)) {
+    if (outcome === "over") {
       stageIndex = Math.max(0, stageIndex - 1);
-    } else if (date < today) {
+    } else {
       stageIndex = Math.min(miniKanakoStages.length - 1, stageIndex + 1);
     }
+  }
 
-    cursor.setDate(cursor.getDate() + 1);
+  if (getDailyBudgetStatus(today, today, goals, spending).status === "over") {
+    stageIndex = Math.max(0, stageIndex - 1);
   }
 
   return miniKanakoStages[stageIndex];

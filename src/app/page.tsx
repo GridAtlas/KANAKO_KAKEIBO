@@ -10,10 +10,12 @@ import { getDailyBudgetMonth, getDailyBudgetStatus, getMiniKanakoStage, type Dai
 import { formatDateShort, monthKeyOf } from "@/lib/date";
 import { formatYen } from "@/lib/money";
 import { useDailyBudget } from "@/lib/useDailyBudget";
+import { useWardrobe } from "@/lib/useWardrobe";
 import { getWeeklyBudget } from "@/lib/weeklyBudget";
 
 export default function HomePage() {
   const { today, goals, spending } = useDailyBudget();
+  const { activeOutfit } = useWardrobe(today, goals, spending);
   const week = today ? getWeeklyBudget(today, goals, spending) : null;
 
   return (
@@ -23,7 +25,7 @@ export default function HomePage() {
         <>
           <div className="mt-5 grid gap-4 md:mt-7 md:grid-cols-[1.12fr_1fr] md:gap-5">
             <TodayBudget day={getDailyBudgetStatus(today, today, goals, spending)} />
-            <MiniKanako stage={getMiniKanakoStage(today, goals, spending)} hasGoal={goals.length > 0} />
+            <MiniKanako stage={getMiniKanakoStage(today, goals, spending)} hasGoal={goals.length > 0} outfit={activeOutfit} />
           </div>
           <div className="mt-4 grid items-start gap-4 md:mt-5 md:grid-cols-[1.12fr_1fr] md:gap-5">
             <WeeklyBudgetCard week={week} />

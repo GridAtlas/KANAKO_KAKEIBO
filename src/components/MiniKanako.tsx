@@ -1,8 +1,8 @@
 import Image from "next/image";
-import { Sparkles } from "lucide-react";
+import Link from "next/link";
+import { ChevronRight, Shirt, Sparkles } from "lucide-react";
 import type { MiniKanakoStage } from "@/lib/dailyBudget";
-
-const assetBasePath = process.env.NODE_ENV === "production" ? "/KANAKO_KAKEIBO" : "";
+import { getOutfitImage, type OutfitId } from "@/lib/wardrobe";
 
 const stages = [
   { label: "まんまるかなこ", message: "レシートの山に埋もれそう！" },
@@ -15,9 +15,11 @@ const stages = [
 export function MiniKanako({
   stage,
   hasGoal,
+  outfit,
 }: {
   stage: MiniKanakoStage;
   hasGoal: boolean;
+  outfit: OutfitId;
 }) {
   const index = stage + 2;
   const { label, message } = stages[index];
@@ -35,18 +37,25 @@ export function MiniKanako({
             {hasGoal ? message : "目標を設定するところから、一緒に始めよう。"}
           </p>
         </div>
-        <div className="mt-4 flex gap-1.5" role="img" aria-label={`5段階のうち${index + 1}段階目`}>
+        <div className="mt-3 flex gap-1.5" role="img" aria-label={`5段階のうち${index + 1}段階目`}>
           {stages.map(({ label: stageLabel }, position) => (
             <span key={stageLabel} className={`h-1.5 w-3 rounded-full ${position === index ? "bg-[#a13e34]" : "bg-[#d7a99a]"}`} />
           ))}
         </div>
+        <Link
+          href="/wardrobe"
+          className="tap-target mt-1 inline-flex items-center gap-1.5 rounded-lg text-xs font-bold text-[#983e34] hover:underline"
+        >
+          <Shirt size={16} aria-hidden="true" />
+          着せ替え
+          <ChevronRight size={14} aria-hidden="true" />
+        </Link>
       </div>
       <div aria-hidden="true" className="absolute inset-y-0 -right-5 flex w-[58%] items-center justify-center sm:-right-2">
         <div className="absolute h-[68%] max-h-52 w-[77%] max-w-52 rounded-full bg-[#fff5e7]/70" />
         <div className="relative aspect-square w-full max-w-[275px]">
           <Image
-            key={index}
-            src={`${assetBasePath}/images/mini-kanako-${index}.webp`}
+            src={getOutfitImage(outfit, stage)}
             alt=""
             fill
             priority

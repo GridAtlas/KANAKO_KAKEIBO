@@ -8,6 +8,7 @@
 │  ├─ layout.tsx  (BottomNav 含む)            │
 │  ├─ page.tsx        今日の予算・ミニかなこ    │
 │  ├─ calendar/      はなまるカレンダー        │
+│  ├─ wardrobe/      ミニかなこの着せ替え      │
 │  ├─ add/page.tsx    登録                    │
 │  ├─ history/        履歴                    │
 │  └─ settings/       カテゴリ / 固定費       │
@@ -19,7 +20,7 @@
 │  store/useBudgetStore.ts (Zustand + persist)│
 │  - categories[], transactions[], fixedCosts │
 │  - selectedMonth, appliedFixedCostMonths    │
-│  - dailyBudgetGoals                         │
+│  - dailyBudgetGoals, unlockedOutfits, activeOutfit │
 │  - actions: add/update/remove/apply...      │
 │  - selectors: monthly totals, by category   │
 └─────────────────────────────────────────────┘
@@ -174,7 +175,7 @@ function getMonthlyByCategory(monthKey: string) {
 ### ホーム・日次目標・分析
 
 - ホーム（`/`）に今日の残り予算または超過額、ミニかなこ、今週の判定、今月のはなまる数を表示する。`/dashboard`（月の家計簿）と `/trends`（月ごとの推移）へも移動できる。
-- `/settings/daily-budget` で0円以上の整数を設定する。目標はローカル日付と金額の組を時系列に保存し、設定日から適用する。同日の再設定は上書きする。Zustand の保存形式 v2 は既存の `kanako_kakeibo` キーを使い、v1 のデータに空の目標履歴を追加する。
+- `/settings/daily-budget` で0円以上の整数を設定する。目標はローカル日付と金額の組を時系列に保存し、設定日から適用する。同日の再設定は上書きする。Zustand の保存形式 v3 は既存の `kanako_kakeibo` キーを使う。v1 からは空の目標履歴と初期衣装を追加し、v2 からは目標履歴を引き継いで初期衣装を追加する。
 - 日次支出は取引の日付ごとに合算し、収入・固定費カテゴリ・固定費から自動生成した取引を除く。目標のある日が目標額以内で終わると、翌日から `/calendar` に達成印を表示する。記録上の支出が0円の日も対象。取引の訂正時は該当日を再集計する。日付を選ぶと当日の目標・支出を見られ、`/history?date=YYYY-MM-DD` に移動できる。
 - 週間予算は月曜から日曜までの目標額の合計。目標を設定した日以降の変動費を集計する。前日までの目標額と支出の差を今日の予算に加減し、月曜に繰り越しをリセットする。目標を週の途中で変更した場合は変更日以降の目標額を合計に反映する。はなまるは引き続き日ごとの目標で判定する。
 - ミニかなこは表紙のイラストを参照した5枚の透過 WebP を使用する。最初は中央の段階から始め、日が終わるたびに目標達成で1段階上がり、超過で1段階下がる。当日の超過は暫定で1段階反映する。
@@ -188,6 +189,26 @@ function getMonthlyByCategory(monthKey: string) {
 表紙の画像を参照に、内蔵 ImageGen で生成した5段階のイラストを `public/images/mini-kanako-0.webp` から `mini-kanako-4.webp` に保存。
 
 > Create a transparent PNG contact sheet of EXACTLY FIVE standalone 3/4-body chibi stickers of the SAME grown Japanese woman, Kanako, for a cheerful Japanese household budget journal app. The attached cover illustration is identity reference only: keep her nearly-black, shoulder-length hair, swept side fringe, large brown eyes, creamy ivory blouse and simple sand-beige apron. Render in a warm, sophisticated Japanese printed storybook / stationery illustration style, clear umber outlines, peach-pink cheeks, light hand-painted texture, soft warm shading, shapes highly legible at 160px. Lay out in ONE horizontal row, five figures centered at exactly 10%, 30%, 50%, 70% and 90% of the width, with generous transparent vertical gutters (minimum 5% of total width between silhouettes) and transparent margin above and below. All figures the same height and not touching each other. Left to right: (1) the roundest soft pear-shaped chibi body and big cheeks, hands on either side of her round apron, puffed-out cheeks, wildly surprised at her shopping total; (2) a slightly round chibi silhouette, holding an open small coin purse, tilted head, sheepish half-smile and one little sweat drop; (3) balanced everyday chibi proportions, cheerful smile, holding a small soft rose-colored budget notebook at waist height; (4) a noticeably slimmer and poised chibi silhouette, smiling with self-confidence, holding a thin pencil near her shoulder and a rose notebook in the other hand; (5) a graceful slim chibi silhouette with polished hair and twinkling eyes, joyfully triumphant raised hand, tiny blush-gold star sparkles closely hugging the upper silhouette. Warm and affectionate character design throughout. Waist-up to upper legs in all five, show hands, include the complete head and apron bottom, softly tapered sticker edges. No scenery, flat ground, rectangular panels, shadows beneath the character, borders, labels, lettering, marks, signs or extra people. Transparent background around every individual sticker. Landscape 3:1 aspect ratio if supported.
+
+</details>
+
+### ミニかなこの着せ替え
+
+- ホームの「着せ替え」から `/wardrobe` を開く。前日までのはなまるを集計し、3日連続で「桜のおでかけ服」、7日連続で「星空のドレス」を解放する。導入前の目標履歴から達成した連続日数も集計する。
+- 解放済みの衣装と着用中の衣装を localStorage に保存する。連続記録が途切れても、解放済みの衣装は着用できる。各衣装に予算状況に応じた5段階のイラストがある。
+
+<details>
+<summary>着せ替え衣装の画像生成プロンプト</summary>
+
+内蔵 ImageGen で2つの衣装を作成し、`public/images/mini-kanako-blossom-{0..4}.webp` と `public/images/mini-kanako-starlight-{0..4}.webp` に保存。
+
+**桜のおでかけ服**
+
+> Edit the supplied five-sticker transparent chibi contact sheet to create the spring cherry-blossom unlockable outfit for Mini Kanako, a Japanese budget journal app mascot. Image 1 is the exact source edit target and identity/pose/layout reference. Replace the cream blouse and tan apron in all five sprites with the SAME soft celadon mint-green spring outing dress, a natural fabric dress with sleeves and a modest rounded ivory scalloped collar, slim sage ribbon belt, and delicate blush-pink embroidered cherry blossom clusters on the bodice and toward the hem. The embroidery should be large enough to show at sticker size, with restrained clusters instead of busy allover pattern. Add one small pale pink five-petal blossom hair clip just above the same visible ear in all five sprites. Preserve the same recognizable faces, hairstyles, eyes, cheek color, expressions, handedness, poses, props, warm storybook texture, confident umber outlines, heights, alignment, and five body proportions from the source. Preserve the five-stage order: round shocked Kanako with yellow surprise marks, sheepish slightly round Kanako with a coin purse and sweat drop, smiling everyday Kanako holding a closed pink notebook, poised slimmer Kanako holding a pencil and pink notebook, and slim celebrating Kanako with a raised fist and gold sparkles. Each outfit should fit her corresponding silhouette. Render EXACTLY five distinct three-quarter body transparent stickers in one landscape row at the same scale and in the same order, with a generous clear transparent gutter between each sticker, clear margin on every side, no floor, scenery, text, labels, or backdrop. Keep all hair, hands, props, dress hems, and stars fully in frame. Target a 3:1 landscape sheet with true alpha around all five figures.
+
+**星空のドレス**
+
+> Use case: identity-preserve try-on. Create one transparent horizontal contact sheet for the Mini Kanako household-budget app, containing exactly five standalone matching chibi illustrations, one per input in the same order from left to right. Reference images 1 through 5 are the same adult Japanese woman in her five spending-result poses. Change only her outfit to a vintage midnight-blue/periwinkle starlight dress with gently puffed sleeves, ivory scalloped neckline, muted indigo layered skirt, fine pale-gold embroidered stars and crescent moons, and a small gold crescent hairpin. Keep the exact same identity, near-black shoulder-length hair and side-swept fringe, skin tone, facial expressions, silhouette, proportions, body angle, framing, hand positions, personal props and reaction effects as each reference. In order: 1 wide round body, surprised open mouth, hands at sides of belly and orange surprise marks; 2 rounded body, sheepish smile, teardrop and pink coin purse; 3 normal body, open smile and pink notebook; 4 slimmer upright pose with pencil in one hand and pink notebook in the other; 5 joyful slim pose with eyes closed, raised fist and gold sparkles. Render in the same warm Japanese printed storybook illustration style with umber ink outlines, peachy cheeks, subtle paper grain and softly painted shading. Five evenly sized independent stickers in one horizontal row with centers at 10%, 30%, 50%, 70% and 90%, matching heights, generous fully transparent gutters, whole heads and skirts visible. Keep the silhouettes compact and legible at 160px. Transparent alpha throughout the background and gutters. No panel borders, ground, background props, captions, watermark or lettering. Wide landscape aspect ratio.
 
 </details>
 
