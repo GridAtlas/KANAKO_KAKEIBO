@@ -7,7 +7,6 @@ import { useBudgetStore } from "@/store/useBudgetStore";
 import { TransactionList } from "@/components/TransactionList";
 import { MonthSwitcher } from "@/components/MonthSwitcher";
 import { daysInMonth, formatDateShort, monthKeyOf } from "@/lib/date";
-import type { Transaction } from "@/types";
 
 const MOBILE_PAGE_SIZE = 4;
 
@@ -58,6 +57,12 @@ function HistoryContent() {
   const filtered = items.filter(
     (t) => (!date || t.date === date) && (!categoryFilter || t.categoryId === categoryFilter),
   );
+  const requestedPage = Number(searchParams.get("page"));
+  const pageCount = Math.ceil(filtered.length / MOBILE_PAGE_SIZE);
+  const page = Number.isSafeInteger(requestedPage) && requestedPage > 1
+    ? Math.min(requestedPage, Math.max(1, pageCount))
+    : 1;
+  const pageStart = (page - 1) * MOBILE_PAGE_SIZE;
 
   function replaceQuery(params: URLSearchParams) {
     const url = new URL(window.location.href);
@@ -68,10 +73,11 @@ function HistoryContent() {
 
   function changeMonth(month: string) {
     setSelectedMonth(month);
-    if (searchParams.has("date") || searchParams.has("month")) {
+    if (searchParams.has("date") || searchParams.has("month") || searchParams.has("page")) {
       const params = new URLSearchParams(searchParams);
       params.delete("date");
       params.delete("month");
+      params.delete("page");
       replaceQuery(params);
     }
   }
@@ -80,7 +86,23 @@ function HistoryContent() {
     const params = new URLSearchParams(searchParams);
     if (category) params.set("category", category);
     else params.delete("category");
+    params.delete("page");
     replaceQuery(params);
+  }
+
+  function changePage(nextPage: number) {
+    const params = new URLSearchParams(searchParams);
+    if (nextPage > 1) params.set("page", String(nextPage));
+    else params.delete("page");
+    replaceQuery(params);
+  }
+
+  function editHref(id: string) {
+    const params = new URLSearchParams({ id, month: monthKey });
+    if (date) params.set("date", date);
+    if (categoryFilter) params.set("category", categoryFilter);
+    if (compact && page > 1) params.set("page", String(page));
+    return `/history/edit?${params}`;
   }
 
   if (compact === undefined) return <HistoryLoading />;
@@ -131,32 +153,11 @@ function HistoryContent() {
         <ChevronDown size={18} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[var(--accent)]" aria-hidden="true" />
       </div>
 
-      <HistoryTransactions
-        key={JSON.stringify([monthKey, date, categoryFilter])}
-        items={filtered}
+      <TransactionList
+        items={compact ? filtered.slice(pageStart, pageStart + MOBILE_PAGE_SIZE) : filtered}
         emptyText={date ? "この日の取引はありません" : "この月の取引はありません"}
         compact={compact}
-      />
-    </main>
-  );
-}
-
-function HistoryTransactions({ items, emptyText, compact }: {
-  items: Transaction[];
-  emptyText: string;
-  compact: boolean;
-}) {
-  const [requestedPage, setRequestedPage] = useState(0);
-  const pageCount = Math.ceil(items.length / MOBILE_PAGE_SIZE);
-  const page = Math.min(requestedPage, Math.max(0, pageCount - 1));
-  const pageStart = page * MOBILE_PAGE_SIZE;
-
-  return (
-    <div className="space-y-1.5">
-      <TransactionList
-        items={compact ? items.slice(pageStart, pageStart + MOBILE_PAGE_SIZE) : items}
-        emptyText={emptyText}
-        compact={compact}
+        editHref={editHref}
       />
       {compact && pageCount > 1 && (
         <div className="flex items-center justify-center gap-2" role="group" aria-label="履歴のページ切り替え">
@@ -164,25 +165,25 @@ function HistoryTransactions({ items, emptyText, compact }: {
             type="button"
             className="tap-target grid place-items-center rounded-full text-[var(--accent)] enabled:bg-[#fbedf0] enabled:hover:bg-[var(--blush)] disabled:text-[#b9a2a8]"
             aria-label="前の履歴ページ"
-            disabled={page === 0}
-            onClick={() => setRequestedPage(page - 1)}
+            disabled={page === 1}
+            onClick={() => changePage(page - 1)}
           >
             <ChevronLeft size={20} aria-hidden="true" />
           </button>
           <span className="min-w-12 text-center text-xs font-bold tabular-nums text-[var(--muted)]" aria-live="polite">
-            {page + 1} / {pageCount}
+            {page} / {pageCount}
           </span>
           <button
             type="button"
             className="tap-target grid place-items-center rounded-full text-[var(--accent)] enabled:bg-[#fbedf0] enabled:hover:bg-[var(--blush)] disabled:text-[#b9a2a8]"
             aria-label="次の履歴ページ"
-            disabled={page === pageCount - 1}
-            onClick={() => setRequestedPage(page + 1)}
+            disabled={page === pageCount}
+            onClick={() => changePage(page + 1)}
           >
             <ChevronRight size={20} aria-hidden="true" />
           </button>
         </div>
       )}
-    </div>
+    </main>
   );
 }

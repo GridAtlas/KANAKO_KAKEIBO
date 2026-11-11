@@ -1,6 +1,7 @@
 "use client";
 
-import { X } from "lucide-react";
+import Link from "next/link";
+import { Pencil, X } from "lucide-react";
 import { useBudgetStore } from "@/store/useBudgetStore";
 import { getIcon } from "@/lib/icons";
 import { formatYen } from "@/lib/money";
@@ -10,11 +11,11 @@ import type { Transaction } from "@/types";
 interface Props {
   items: Transaction[];
   emptyText?: string;
-  onItemClick?: (t: Transaction) => void;
+  editHref?: (id: string) => string;
   compact?: boolean;
 }
 
-export function TransactionList({ items, emptyText, onItemClick, compact }: Props) {
+export function TransactionList({ items, emptyText, editHref, compact }: Props) {
   const getCategoryById = useBudgetStore((s) => s.getCategoryById);
   const removeTransaction = useBudgetStore((s) => s.removeTransaction);
 
@@ -33,12 +34,9 @@ export function TransactionList({ items, emptyText, onItemClick, compact }: Prop
         const Icon = getIcon(cat?.icon ?? "HelpCircle");
         const color = cat?.color ?? "slate";
         const isIncome = cat?.type === "income";
-        return (
-          <div
-            key={t.id}
-            className={`flex items-center ${compact ? "gap-2 px-2 py-0.5" : "gap-3 px-3 py-2.5"}`}
-            onClick={() => onItemClick?.(t)}
-          >
+        const contentClass = `flex min-w-0 flex-1 items-center ${compact ? "gap-2" : "gap-3"}`;
+        const content = (
+          <>
             <div
               className={`flex shrink-0 items-center justify-center rounded-full ring-1 ring-inset ring-black/5 ${compact ? "size-8" : "size-10"} bg-${color}-100 text-${color}-700`}
             >
@@ -68,12 +66,24 @@ export function TransactionList({ items, emptyText, onItemClick, compact }: Prop
               {isIncome ? "+" : ""}
               {formatYen(t.amount)}
             </div>
+          </>
+        );
+        return (
+          <div key={t.id} className={`flex items-center ${compact ? "gap-1 px-2 py-0.5" : "gap-2 px-3 py-2.5"}`}>
+            {editHref ? (
+              <Link href={editHref(t.id)} className={`${contentClass} min-h-11 rounded-lg hover:bg-[#fbebef]`}>
+                {content}
+                <Pencil size={14} className="shrink-0 text-[var(--accent)]" aria-hidden="true" />
+                <span className="sr-only">を編集</span>
+              </Link>
+            ) : (
+              <div className={contentClass}>{content}</div>
+            )}
             <button
               type="button"
               className="tap-target -mr-1 p-1 text-[var(--muted)] hover:text-[var(--accent)]"
               aria-label="削除"
-              onClick={(e) => {
-                e.stopPropagation();
+              onClick={() => {
                 if (confirm("この取引を削除しますか？")) {
                   removeTransaction(t.id);
                 }

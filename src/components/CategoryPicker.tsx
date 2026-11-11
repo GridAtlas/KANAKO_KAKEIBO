@@ -16,7 +16,7 @@ const singlePageLimit = 12;
 
 export function CategoryPicker({ selectedId, onSelect, filterType }: Props) {
   const categories = useBudgetStore((s) => s.categories);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState<number>();
 
   const visible = useMemo(() => {
     const list = filterType
@@ -26,14 +26,17 @@ export function CategoryPicker({ selectedId, onSelect, filterType }: Props) {
   }, [categories, filterType]);
   const categoriesPerPage = visible.length > singlePageLimit ? 8 : singlePageLimit;
   const pageCount = Math.ceil(visible.length / categoriesPerPage);
-  const currentPage = Math.min(page, Math.max(0, pageCount - 1));
+  const selectedIndex = visible.findIndex((category) => category.id === selectedId);
+  const selectedPage = Math.floor(Math.max(0, selectedIndex) / categoriesPerPage);
+  const currentPage = Math.min(page ?? selectedPage, Math.max(0, pageCount - 1));
   const start = currentPage * categoriesPerPage;
+  const heading = selectedId && selectedIndex < 0 ? "カテゴリ（削除済み）" : "カテゴリ";
 
   return (
     <fieldset className="min-w-0">
-      <legend className="sr-only">カテゴリ</legend>
+      <legend className="sr-only">{heading}</legend>
       <div className="mb-1 flex items-center justify-between">
-        <p className="text-sm font-bold text-[#755d62]" aria-hidden="true">カテゴリ</p>
+        <p className="text-sm font-bold text-[#755d62]" aria-hidden="true">{heading}</p>
         {pageCount > 1 && (
           <div className="flex items-center gap-1 text-xs font-bold tabular-nums text-[#755d62]">
             <button

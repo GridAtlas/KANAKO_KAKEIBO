@@ -6,26 +6,40 @@ import { ArrowDownLeft, ArrowUpRight, CalendarDays, ChevronDown } from "lucide-r
 import { useBudgetStore } from "@/store/useBudgetStore";
 import { todayLocal } from "@/lib/date";
 import { formatYenNoSign, parseYenInput } from "@/lib/money";
-import type { CategoryType } from "@/types";
+import type { CategoryType, Transaction } from "@/types";
 import { CategoryPicker } from "./CategoryPicker";
+import { TransactionPresets } from "./TransactionPresets";
 
 const transactionTypes = [
   { id: "expense", label: "支出", icon: ArrowUpRight, selectedClass: "bg-[#fffcf8] text-[#a53c55]" },
   { id: "income", label: "収入", icon: ArrowDownLeft, selectedClass: "bg-[#eff5ee] text-[#53705c]" },
 ] as const;
 
-export function TransactionForm() {
+export function TransactionForm({ transaction, returnHref = "/today" }: {
+  transaction?: Transaction;
+  returnHref?: string;
+}) {
   const router = useRouter();
   const addTransaction = useBudgetStore((state) => state.addTransaction);
-  const [type, setType] = useState<CategoryType>("expense");
-  const [amountInput, setAmountInput] = useState("");
-  const [categoryId, setCategoryId] = useState("");
-  const [date, setDate] = useState(todayLocal);
-  const [memo, setMemo] = useState("");
+  const updateTransaction = useBudgetStore((state) => state.updateTransaction);
+  const categories = useBudgetStore((state) => state.categories);
+  const [type, setType] = useState<CategoryType>(
+    () => categories.find((category) => category.id === transaction?.categoryId)?.type ?? "expense",
+  );
+  const [amountInput, setAmountInput] = useState(() => transaction ? formatYenNoSign(transaction.amount) : "");
+  const [categoryId, setCategoryId] = useState(transaction?.categoryId ?? "");
+  const [date, setDate] = useState(() => transaction?.date ?? todayLocal());
+  const [memo, setMemo] = useState(transaction?.memo ?? "");
+  const [presetSelectionCount, setPresetSelectionCount] = useState(0);
 
   const amount = parseYenInput(amountInput);
   const invalidAmount = /[.．−-]/.test(amountInput) || !Number.isSafeInteger(amount);
   const canSubmit = !invalidAmount && amount > 0 && Boolean(categoryId && date);
+  const selectedCategory = categories.find((category) => category.id === categoryId);
+  const showPresets = !transaction && type === "expense";
+  const presetDraft = !invalidAmount && amount > 0 && selectedCategory?.type === "expense"
+    ? { categoryId, amount, memo: memo.trim() || undefined }
+    : undefined;
 
   function selectType(nextType: CategoryType) {
     if (type === nextType) return;
@@ -37,25 +51,44 @@ export function TransactionForm() {
     event.preventDefault();
     if (!canSubmit) return;
 
-    addTransaction({ categoryId, amount, date, memo: memo.trim() || undefined });
-    router.push("/today");
+    const fields = { categoryId, amount, date, memo: memo.trim() || undefined };
+    if (transaction) {
+      updateTransaction(transaction.id, fields);
+      router.replace(returnHref);
+    } else {
+      addTransaction(fields);
+      router.push(returnHref);
+    }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-2 space-y-1.5">
-      <div role="group" aria-label="取引の種類" className="grid grid-cols-2 gap-1 rounded-xl bg-[#f5e8eb] p-0.5">
-        {transactionTypes.map(({ id, label, icon: Icon, selectedClass }) => (
-          <button
-            key={id}
-            type="button"
-            aria-pressed={type === id}
-            onClick={() => selectType(id)}
-            className={`tap-target flex items-center justify-center gap-1.5 rounded-[10px] text-sm font-bold ${type === id ? `${selectedClass} shadow-sm` : "text-[#755d62]"}`}
-          >
-            <Icon size={15} strokeWidth={1.9} aria-hidden="true" />
-            {label}
-          </button>
-        ))}
+    <form onSubmit={handleSubmit} className={transaction ? "mt-1 space-y-1" : "mt-2 space-y-1.5"}>
+      <div className="flex items-center gap-1.5">
+        <div role="group" aria-label="取引の種類" className="grid min-w-0 flex-1 grid-cols-2 gap-1 rounded-xl bg-[#f5e8eb] p-0.5">
+          {transactionTypes.map(({ id, label, icon: Icon, selectedClass }) => (
+            <button
+              key={id}
+              type="button"
+              aria-pressed={type === id}
+              onClick={() => selectType(id)}
+              className={`tap-target flex items-center justify-center gap-1.5 rounded-[10px] text-sm font-bold ${type === id ? `${selectedClass} shadow-sm` : "text-[#755d62]"}`}
+            >
+              <Icon size={15} strokeWidth={1.9} aria-hidden="true" />
+              {label}
+            </button>
+          ))}
+        </div>
+        {showPresets && (
+          <TransactionPresets
+            draft={presetDraft}
+            onSelect={(preset) => {
+              setCategoryId(preset.categoryId);
+              setAmountInput(formatYenNoSign(preset.amount));
+              setMemo(preset.memo ?? "");
+              setPresetSelectionCount((count) => count + 1);
+            }}
+          />
+        )}
       </div>
 
       <div>
@@ -80,9 +113,9 @@ export function TransactionForm() {
         )}
       </div>
 
-      <CategoryPicker key={type} selectedId={categoryId} onSelect={setCategoryId} filterType={type} />
+      <CategoryPicker key={`${type}:${presetSelectionCount}`} selectedId={categoryId} onSelect={setCategoryId} filterType={type} />
 
-      <details className="group rounded-xl border border-[#ecd9dd] bg-[#fffcf8]">
+      <details open={transaction ? true : undefined} className="group rounded-xl border border-[#ecd9dd] bg-[#fffcf8]">
         <summary className="tap-target flex cursor-pointer list-none items-center justify-between gap-2 rounded-xl px-3 text-sm font-bold text-[#755d62] [&::-webkit-details-marker]:hidden">
           <span className="flex items-center gap-1.5"><CalendarDays size={16} className="text-[#a53c55]" aria-hidden="true" />日付・メモ</span>
           <ChevronDown size={16} className="group-open:rotate-180" aria-hidden="true" />
@@ -112,7 +145,7 @@ export function TransactionForm() {
         disabled={!canSubmit}
         className="tap-target flex w-full items-center justify-center rounded-xl bg-[#a53c55] px-3 text-sm font-bold text-white enabled:shadow-[0_3px_10px_rgba(165,60,85,0.16)] enabled:hover:bg-[#893047] disabled:bg-[#eedfe2] disabled:text-[#755d62]"
       >
-        保存
+        {transaction ? "変更を保存" : "保存"}
       </button>
     </form>
   );
