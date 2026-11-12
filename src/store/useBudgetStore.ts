@@ -18,10 +18,10 @@ import type {
   TransactionPresetInput,
 } from "@/types";
 import { DEFAULT_CATEGORIES, STORAGE_KEY, STORAGE_VERSION } from "@/lib/constants";
-import type { DailyBudgetGoal } from "@/lib/dailyBudget";
+import { getDailySpending, type DailyBudgetGoal } from "@/lib/dailyBudget";
 import { currentMonthKey, monthKeyOf, todayLocal } from "@/lib/date";
 import { fixedCostToTransactionInput } from "@/lib/fixedCosts";
-import { DEFAULT_OUTFIT, getUnlockedOutfits, type OutfitId } from "@/lib/wardrobe";
+import { DEFAULT_OUTFIT, getUnlockedOutfits, getWardrobeProgress, type OutfitId } from "@/lib/wardrobe";
 
 function uuid(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -54,6 +54,7 @@ interface BudgetStore {
   dailyBudgetGoals: DailyBudgetGoal[];
   unlockedOutfits: OutfitId[];
   activeOutfit: OutfitId;
+  velvetEarnedDate?: string;
   debugOutfit: OutfitId | null;
 
   // Categories
@@ -90,7 +91,7 @@ interface BudgetStore {
   setDailyBudgetGoal: (amount: number) => void;
 
   // Wardrobe
-  updateWardrobe: (longestStreak: number, outfit?: OutfitId) => void;
+  updateWardrobe: (today: string, outfit?: OutfitId) => void;
   setDebugOutfit: (outfit: OutfitId | null) => void;
 
   // Fixed cost application
@@ -115,6 +116,7 @@ type PersistedBudgetState = Pick<
   | "dailyBudgetGoals"
   | "unlockedOutfits"
   | "activeOutfit"
+  | "velvetEarnedDate"
 >;
 
 const initialWardrobe: Pick<PersistedBudgetState, "unlockedOutfits" | "activeOutfit"> = {
@@ -372,13 +374,17 @@ const createBudgetStore: StateCreator<BudgetStore, [], [["zustand/persist", Pers
         }));
       },
 
-      updateWardrobe: (longestStreak, outfit) => {
-        const { unlockedOutfits, activeOutfit } = get();
-        const availableOutfits = getUnlockedOutfits(longestStreak, unlockedOutfits);
+      updateWardrobe: (today, outfit) => {
+        const { unlockedOutfits, activeOutfit, velvetEarnedDate, dailyBudgetGoals, transactions, categories } = get();
+        const spending = getDailySpending(transactions, categories);
+        const progress = getWardrobeProgress(today, dailyBudgetGoals, spending, unlockedOutfits, velvetEarnedDate);
+        const availableOutfits = getUnlockedOutfits(progress, unlockedOutfits);
         const selection = outfit && availableOutfits.includes(outfit) ? outfit : activeOutfit;
-        if (availableOutfits.length === unlockedOutfits.length && selection === activeOutfit) return;
+        if (availableOutfits.length === unlockedOutfits.length
+          && selection === activeOutfit
+          && progress.velvetEarnedDate === velvetEarnedDate) return;
 
-        set({ unlockedOutfits: availableOutfits, activeOutfit: selection });
+        set({ unlockedOutfits: availableOutfits, activeOutfit: selection, velvetEarnedDate: progress.velvetEarnedDate });
       },
 
       // 試着操作では persist を経由せず、家計簿データを書き戻さない。
@@ -460,6 +466,7 @@ const createBudgetStore: StateCreator<BudgetStore, [], [["zustand/persist", Pers
         dailyBudgetGoals: state.dailyBudgetGoals,
         unlockedOutfits: state.unlockedOutfits,
         activeOutfit: state.activeOutfit,
+        velvetEarnedDate: state.velvetEarnedDate,
       }),
     },
   )(setTransient, get, api);

@@ -3,7 +3,7 @@
 import { useEffect, useMemo } from "react";
 import { useBudgetStore } from "@/store/useBudgetStore";
 import type { DailyBudgetGoal } from "./dailyBudget";
-import { getHanamaruStreaks, getUnlockedOutfits, WARDROBE_OUTFITS, type OutfitId } from "./wardrobe";
+import { getWardrobeProgress, getUnlockedOutfits, WARDROBE_OUTFITS, type OutfitId } from "./wardrobe";
 
 const allOutfitIds = WARDROBE_OUTFITS.map(({ id }) => id);
 
@@ -16,32 +16,36 @@ export function useWardrobe(
   const debugOutfit = useBudgetStore((state) => state.debugOutfit);
   const setDebugOutfit = useBudgetStore((state) => state.setDebugOutfit);
   const previouslyUnlocked = useBudgetStore((state) => state.unlockedOutfits);
+  const velvetEarnedDate = useBudgetStore((state) => state.velvetEarnedDate);
   const updateWardrobe = useBudgetStore((state) => state.updateWardrobe);
   const isDebugMode = debugOutfit !== null;
-  const { current: currentStreak, longest: longestStreak } = useMemo(
-    () => today ? getHanamaruStreaks(today, goals, spending) : { current: 0, longest: 0 },
-    [today, goals, spending],
+  const progress = useMemo(
+    () => getWardrobeProgress(today, goals, spending, previouslyUnlocked, velvetEarnedDate),
+    [today, goals, spending, previouslyUnlocked, velvetEarnedDate],
   );
   const unlockedOutfits = useMemo(
-    () => getUnlockedOutfits(longestStreak, previouslyUnlocked),
-    [longestStreak, previouslyUnlocked],
+    () => getUnlockedOutfits(progress, previouslyUnlocked),
+    [progress, previouslyUnlocked],
   );
+  const shouldSaveProgress = progress.velvetEarnedDate !== velvetEarnedDate
+    || unlockedOutfits.length !== previouslyUnlocked.length;
 
   useEffect(() => {
-    if (today) updateWardrobe(longestStreak);
-  }, [today, longestStreak, updateWardrobe]);
+    if (today && shouldSaveProgress) updateWardrobe(today);
+  }, [today, shouldSaveProgress, updateWardrobe]);
 
   function setActiveOutfit(outfit: OutfitId) {
     if (isDebugMode) {
       setDebugOutfit(outfit);
       return;
     }
-    updateWardrobe(longestStreak, outfit);
+    if (today) updateWardrobe(today, outfit);
   }
 
   return {
-    currentStreak,
-    longestStreak,
+    currentStreak: progress.currentStreak,
+    longestStreak: progress.longestStreak,
+    earnedHanamaru: progress.earnedHanamaru,
     unlockedOutfits: isDebugMode ? allOutfitIds : unlockedOutfits,
     activeOutfit: debugOutfit ?? activeOutfit,
     setActiveOutfit,

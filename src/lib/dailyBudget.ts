@@ -77,7 +77,7 @@ export function* getCompletedDailyBudgetOutcomes(
   today: string,
   goals: readonly DailyBudgetGoal[],
   spending: ReadonlyMap<string, number>,
-): Generator<"achieved" | "over"> {
+): Generator<{ date: string; outcome: "achieved" | "over" }> {
   const start = goals[0]?.effectiveFrom;
   if (!start || start >= today) return;
 
@@ -90,7 +90,7 @@ export function* getCompletedDailyBudgetOutcomes(
     while (goals[goalIndex + 1] && goals[goalIndex + 1].effectiveFrom <= date) goalIndex++;
 
     const amount = spending.get(date) ?? 0;
-    yield amount > goals[goalIndex].amount ? "over" : "achieved";
+    yield { date, outcome: amount > goals[goalIndex].amount ? "over" : "achieved" };
     cursor.setDate(cursor.getDate() + 1);
   }
 }
@@ -102,7 +102,7 @@ export function getMiniKanakoStage(
 ): MiniKanakoStage {
   let stageIndex = 2;
 
-  for (const outcome of getCompletedDailyBudgetOutcomes(today, goals, spending)) {
+  for (const { outcome } of getCompletedDailyBudgetOutcomes(today, goals, spending)) {
     if (outcome === "over") {
       stageIndex = Math.max(0, stageIndex - 1);
     } else {

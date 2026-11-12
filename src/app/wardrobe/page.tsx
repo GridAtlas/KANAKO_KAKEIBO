@@ -2,13 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, BookOpen, Check, Flower, Flower2, Leaf, LockKeyhole, MoonStar, Shirt, Sparkles, type LucideIcon } from "lucide-react";
+import { ArrowRight, BookOpen, Check, Crown, Flower, Flower2, Gem, Leaf, LockKeyhole, MoonStar, Scissors, Shirt, Sparkles, Waves, type LucideIcon } from "lucide-react";
 import { useRef, useState } from "react";
 import { BudgetPageHeader } from "@/components/BudgetPageHeader";
 import { getMiniKanakoStage } from "@/lib/dailyBudget";
 import { useDailyBudget } from "@/lib/useDailyBudget";
 import { useWardrobe } from "@/lib/useWardrobe";
-import { getOutfitImage, getVisibleOutfits, type OutfitId } from "@/lib/wardrobe";
+import { getOutfitImage, getVisibleOutfits, OUTFITS_PER_GROUP, type OutfitId } from "@/lib/wardrobe";
 
 const outfitPreviews: Record<OutfitId, {
   label: string;
@@ -59,20 +59,71 @@ const outfitPreviews: Record<OutfitId, {
     motifColor: "text-[#8b526b]/45",
     selected: "border-[#9c6279] bg-[#f2e4eb] text-[#743d57]",
   },
+  tailored: {
+    label: "コート",
+    backdrop: "from-[#fcf5e9] via-[#f3e6d3] to-[#e8d2b6]",
+    motif: Scissors,
+    motifColor: "text-[#896243]/45",
+    selected: "border-[#ad825b] bg-[#f3e5d3] text-[#694b32]",
+  },
+  silk: {
+    label: "シルク",
+    backdrop: "from-[#f0f5f1] via-[#ddebe6] to-[#c0dcd4]",
+    motif: Waves,
+    motifColor: "text-[#3d706c]/45",
+    selected: "border-[#62918b] bg-[#dfede8] text-[#305c58]",
+  },
+  pearl: {
+    label: "パール",
+    backdrop: "from-[#f9f3f9] via-[#ede6f0] to-[#ded3e6]",
+    motif: Gem,
+    motifColor: "text-[#756382]/45",
+    selected: "border-[#9682a1] bg-[#eee6f1] text-[#665171]",
+  },
+  atelier: {
+    label: "アトリエ",
+    backdrop: "from-[#f5f1fa] via-[#e6dfef] to-[#d6c9e3]",
+    motif: Scissors,
+    motifColor: "text-[#715586]/45",
+    selected: "border-[#9176a7] bg-[#ece3f2] text-[#5e4772]",
+  },
+  couture: {
+    label: "刺繍",
+    backdrop: "from-[#fcf1ec] via-[#f0dce2] to-[#e6c5cf]",
+    motif: Flower2,
+    motifColor: "text-[#8e5064]/45",
+    selected: "border-[#a46578] bg-[#f4e2e8] text-[#763e52]",
+  },
+  signature: {
+    label: "特別仕立て",
+    backdrop: "from-[#fff9ed] via-[#f2e9d8] to-[#dce2e9]",
+    motif: Crown,
+    motifColor: "text-[#8a6834]/50",
+    selected: "border-[#ad8a52] bg-[#f5ebd9] text-[#705521]",
+  },
 };
 
 export default function WardrobePage() {
   const { today, goals, spending } = useDailyBudget();
   const {
-    currentStreak, longestStreak, unlockedOutfits, activeOutfit, setActiveOutfit, isDebugMode, exitDebugMode,
+    currentStreak, longestStreak, earnedHanamaru, unlockedOutfits, activeOutfit, setActiveOutfit, isDebugMode, exitDebugMode,
   } = useWardrobe(today, goals, spending);
   const [previewOutfit, setPreviewOutfit] = useState<OutfitId>();
   const selectedPreviewButton = useRef<HTMLButtonElement>(null);
   const visibleOutfits = getVisibleOutfits(unlockedOutfits);
-  const selectedIndex = Math.max(0, visibleOutfits.findIndex(({ id }) => id === (previewOutfit ?? activeOutfit)));
+  const previewIndex = visibleOutfits.findIndex(({ id }) => id === previewOutfit);
+  const selectedIndex = previewIndex >= 0 ? previewIndex : Math.max(0, visibleOutfits.findIndex(({ id }) => id === activeOutfit));
+  const groupStart = Math.floor(selectedIndex / OUTFITS_PER_GROUP) * OUTFITS_PER_GROUP;
+  const groupCount = Math.ceil(visibleOutfits.length / OUTFITS_PER_GROUP);
+  const groupOutfits = visibleOutfits.slice(groupStart, groupStart + OUTFITS_PER_GROUP);
   const outfit = visibleOutfits[selectedIndex];
   const unlocked = unlockedOutfits.includes(outfit.id);
   const wearing = outfit.id === activeOutfit;
+  const streakCondition = "requiredStreak" in outfit;
+  const unlockCondition = streakCondition
+    ? `はなまる${outfit.requiredStreak}日連続で解放`
+    : `6着目解放後のはなまる${outfit.requiredHanamaru}個`;
+  const remaining = streakCondition ? outfit.requiredStreak - currentStreak : outfit.requiredHanamaru - earnedHanamaru;
   const stage = today ? getMiniKanakoStage(today, goals, spending) : 0;
   const { backdrop, motif: Motif, motifColor } = outfitPreviews[outfit.id];
   const image = getOutfitImage(outfit.id, stage);
@@ -115,6 +166,32 @@ export default function WardrobePage() {
 
         {today ? (
           <>
+            {groupCount > 1 && (
+              <div className="mb-1.5 grid grid-flow-col auto-cols-fr gap-1.5" role="group" aria-label="衣装のページ">
+                {Array.from({ length: groupCount }, (_, index) => {
+                  const start = index * OUTFITS_PER_GROUP;
+                  const end = Math.min(start + OUTFITS_PER_GROUP, visibleOutfits.length);
+                  const selected = start === groupStart;
+                  const range = `${start + 1}〜${end}`;
+                  return (
+                    <button
+                      key={start}
+                      type="button"
+                      aria-label={`${range}着目`}
+                      aria-pressed={selected}
+                      onClick={() => {
+                        if (selected) return;
+                        const page = visibleOutfits.slice(start, end);
+                        setPreviewOutfit((page.find(({ id }) => id === activeOutfit) ?? page[0]).id);
+                      }}
+                      className={`tap-target rounded-xl border px-1 text-xs font-bold tabular-nums sm:text-sm ${selected ? "border-[#a53c55] bg-[#f7dce4] text-[#893047]" : "border-[var(--line)] bg-[var(--surface)] text-[var(--muted)] hover:bg-[#fbebef]"}`}
+                    >
+                      {range}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
             <figure className={`overflow-hidden rounded-[20px] border shadow-[0_5px_18px_rgba(132,66,82,0.09)] ${unlocked ? "border-[var(--line)] bg-[var(--surface)]" : "border-[#d7d7dd] bg-[#f6f6f7]"}`}>
               <div className={`relative isolate flex h-[clamp(8rem,32dvh,17rem)] items-center justify-center overflow-hidden bg-gradient-to-br sm:h-[clamp(11rem,44dvh,22rem)] ${unlocked ? backdrop : "from-[#f4f4f6] via-[#ebebef] to-[#dcdce2]"}`}>
                 {unlocked ? (
@@ -152,17 +229,17 @@ export default function WardrobePage() {
                   {unlocked ? outfit.name : `${selectedIndex + 1}着目`}
                 </span>
                 {!unlocked && (
-                  <span className="text-xs font-semibold text-[#65656f]">はなまる{outfit.requiredStreak}日連続で解放</span>
+                  <span className="text-xs font-semibold text-[#65656f]">{unlockCondition}</span>
                 )}
               </figcaption>
             </figure>
 
             <div className="mt-2 grid grid-cols-3 gap-1.5 sm:gap-2" role="group" aria-label="衣装のプレビュー">
-              {visibleOutfits.map(({ id, name }, index) => {
+              {groupOutfits.map(({ id, name }, index) => {
                 const isWearing = id === activeOutfit;
                 const isLocked = !unlockedOutfits.includes(id);
                 const selected = id === outfit.id;
-                const label = isLocked ? `${index + 1}着目` : outfitPreviews[id].label;
+                const label = isLocked ? `${groupStart + index + 1}着目` : outfitPreviews[id].label;
                 const appearance = isLocked
                   ? (selected ? "border-[#82828e] bg-[#e4e4e9] text-[#45454f]" : "border-[#d8d8de] bg-[#f2f2f4] text-[#65656f] hover:bg-[#e9e9ed]")
                   : (selected ? outfitPreviews[id].selected : "border-[var(--line)] bg-[var(--surface)] text-[var(--muted)] hover:bg-[#fbebef]");
@@ -204,7 +281,7 @@ export default function WardrobePage() {
                 </Link>
               ) : (
                 <p role="status" className={`flex min-h-11 items-center justify-center gap-1.5 rounded-xl px-2 text-sm font-bold tabular-nums ${unlocked ? "bg-[#f5e8eb] text-[var(--muted)]" : "bg-[#f0f0f2] text-[#595963]"}`}>
-                  {wearing ? <><Check size={16} aria-hidden="true" />着用中</> : `解放まであと${outfit.requiredStreak - currentStreak}日`}
+                  {wearing ? <><Check size={16} aria-hidden="true" />着用中</> : `解放まであと${remaining}${streakCondition ? "日" : "個"}`}
                 </p>
               )}
             </div>

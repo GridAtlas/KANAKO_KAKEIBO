@@ -200,9 +200,10 @@ function getMonthlyByCategory(monthKey: string) {
 
 ### ミニかなこの着せ替え
 
-- ホームの「着せ替え」から `/wardrobe` を開く。ボタンで衣装を選び、中央に1着ずつ表示する。前日までのはなまるが3日・7日・10日・14日・21日連続すると、順に「桜のおでかけ服」「星空のドレス」「リネンの街歩き」「庭園のティードレス」「ベルベットの夜会服」が解放される。導入前の目標履歴から達成した連続日数も集計する。
-- 最初はエプロンを含む3着を表示する。3着目までそろうと次の3着を表示し、今後の衣装も3着ずつ同じ順番で表示する。未解放の衣装は番号とグレーのシルエットで予告する。
-- 解放済みの衣装と着用中の衣装を localStorage に保存する。連続記録が途切れても、解放済みの衣装は着用できる。各衣装に予算状況に応じた5段階のイラストがあり、同じ段階では頭の高さと裾の位置をエプロンに合わせる。
+- ホームの「着せ替え」から `/wardrobe` を開く。はなまるが3日・7日・10日・14日・21日連続すると、順に「桜のおでかけ服」「星空のドレス」「リネンの街歩き」「庭園のティードレス」「ベルベットの夜会服」が解放される。最高連続日数は月をまたいで上限なく集計する。
+- 6着目の条件を達成した日の翌日から、はなまるが付いた日を通算する。7・14・21・30・45・60個で7〜12着目を順に解放する。既存の履歴も集計に使い、解放済みの6着目の達成日を復元できない場合は、更新後に初めて集計した日から数える。カレンダーではその月のはなまるを確認できる。
+- 最初はエプロンを含む3着を表示する。表示中の衣装がそろうと次の3着が現れ、ボタンで3着ずつ切り替える。未解放の衣装は番号とグレーのシルエットで予告する。
+- 解放済みの衣装、着用中の衣装、6着目の達成日を localStorage に保存する。各衣装に予算状況に応じた5段階のイラストがあり、同じ段階では頭の高さと裾の位置をエプロンに合わせる。
 - タイトル画面のかなこを1秒以内の間隔で5回続けてタップすると、デバッグモードで着せ替え画面を開き、全衣装を試着できる。デバッグの着用状態はタブのメモリに保持する。「デバッグを終了」またはページの再読み込みで、通常の解放状況と着用中の衣装に戻る。
 
 ### 履歴の編集・よく使う支出・目的別の貯金
@@ -244,6 +245,29 @@ function getMonthlyByCategory(monthKey: string) {
 **ベルベットの夜会服**
 
 > a deep burgundy tailored velvet evening jacket with a crisp ivory collar, one restrained tiny antique gold lapel pin, and an understated charcoal skirt or dress below the fitted waist, suitable for a city evening. Understated modern city styling
+
+</details>
+
+<details>
+<summary>7〜12着目の画像生成プロンプト</summary>
+
+内蔵 ImageGen にエプロン姿の5ポーズを渡し、各テンプレートの `OUTFIT` を衣装ごとの指定に差し替えた。透過 WebP は `public/images/mini-kanako-{tailored,silk,pearl,atelier,couture,signature}-{0..4}.webp` に保存した。
+
+**7〜9着目の共通指定**
+
+> Use case: identity-preserve try-on. Produce one horizontal transparent sprite contact sheet for the Mini Kanako wardrobe, with five independent stickers aligned at the same scale. Input images 1 to 5 are the five original apron sprites. They are the exact pose, framing, style and identity references. Copy the original Mini Kanako adult chibi figures in the supplied left-to-right order and change only the outfit. In every pose replace the original clothing with OUTFIT Keep every head at exactly the same size relative to the body as in its input. Keep the exact face, expression, eye shapes, warm skin tone, shoulder-length nearly-black hair, side fringe, head angle, body angle, hand positions, fingers, paper props and reaction marks. Preserve each input's apparent character width and height and the original bust-to-lower-hem framing. Pose 1 is round and startled with hands on belly and orange reaction marks, pose 2 is sheepish with a pink coin purse and small tear, pose 3 smiles holding a pink notebook at waist, pose 4 is slimmer with pink notebook and pencil, pose 5 has a joyful closed-eye smile, raised fist and gold sparkles. Preserve the fine sepia outlines, warm watercolor shading and subtle paper grain of the original storybook rendering. Place all five figures in one horizontal row, one per equal cell, centers at 10%, 30%, 50%, 70%, and 90% of total width. Align the heads and lower hem to match the supplied poses; completely transparent gutters and space around every figure. No backgrounds, scenery, extra props, text, borders, labels, logos, or shadows on the ground. True transparent alpha. Landscape 3:1 aspect ratio.
+
+- テーラードコート — a very finely tailored muted camel cashmere coat with a gently sculpted waist, crisp long notched lapels, clean princess seams, and one small antique-gold fastening. A little cream lining peeks at the neckline. Refined natural beige, warm honey, and light coffee tones. Keep the forearm and hands clear in every pose and keep the wool hem at the original apron hem. High-end daytime tailoring, with no scarf or embroidery.
+- シルクのドレス — a luxurious muted deep-teal silk evening dress with an elegant gently draped boat neckline, softly gathered sleeves and subtle sheen following the folds, carefully tailored at the waist. The skirt has a restrained bias-cut drape and falls exactly to the original apron hem. The dark deep teal should be readable even at a small size, with soft petrol-blue highlights. One tiny warm gold fastener at a cuff. No glitter, patterns, or loose fabric outside the original silhouette.
+- パールの装い — a polished couture dinner ensemble in elegant muted lilac-gray, with a fitted softly structured jacket over a cool smoky lilac skirt. Fine scalloped satin piping along the collar and cuffs, and a short delicate row of ivory pearls as a necklace, closely fitted at the neckline. Retain graceful clean seams, and subtly luminous pearl detailing visible at sticker size. Softly fitted sleeves and the same garment hem as the apron sprite. No extra accessories or embroidery.
+
+**10〜12着目の共通指定**
+
+> Use case: identity-preserve try-on for the Mini Kanako household budget app. Produce one transparent horizontal contact sheet of exactly five separate stickers, one for each supplied original apron reference, in the same numbered left-to-right order. All five stickers are one character wearing one consistent new outfit. Replace only the clothing in each input with OUTFIT. Each image numbered 1 to 5 is the direct edit target and precise pose, framing, style and identity guide for its corresponding sticker. Preserve the same face, hair, expression, proportions, head size and hand positions. Keep the notebooks, purse, pencil, orange reaction marks and gold sparkles from their own corresponding source poses. Pose 1 is round and startled with hands on belly and orange marks; pose 2 is sheepish with a pink coin purse and a small tear; pose 3 smiles holding a pink notebook at waist; pose 4 is slimmer with pink notebook and pencil; pose 5 is joyful with a raised fist and original gold sparkles. Preserve the original sleeves' outer dimensions, head-to-hem ratio and original figure's exact hem height. No new visual elements outside the original figure and its props. Warm printed Japanese storybook illustration with fine dark-umber linework, soft watercolors, gentle paper grain, and clean legibility at thumbnail scale. Five upright equally sized cells, in ONE horizontal row, with centers at 10%, 30%, 50%, 70%, 90% of sheet width, roomy truly transparent gutters and margins on all sides. Landscape 3:1. No backdrop, floor, text, frame, logo, additional motifs, or drop shadow. True transparent alpha.
+
+- メゾン・カナコのジャケット — a structured midnight-violet double-breasted tailored jacket in fine satin wool, sharp clean lapels, quiet short brass cuff buttons and a pale smoke-lavender silk blouse visible at the collar; a matching refined dark pleated skirt visible at the original hem. Elegant fitted precision tailoring with graceful waist shaping, a timeless private-atelier look.
+- メゾン・カナコの刺繍ドレス — a burgundy and warm champagne couture ensemble: a wine-red silk bodice with a refined curved champagne neckline, gracefully fitted sheer-free sleeves, a champagne satin skirt with an elegant wine-red panel, and sparse tasteful vintage gold thread embroidery at collar and cuff. Use fine woven satin sheen and a polished luxurious private atelier look.
+- メゾン・カナコのサファイアドレス — an original couture house's statement ivory and muted gold evening gown. Tailor a sculpted ivory satin bodice, elegantly draped fitted long sleeves, understated champagne-gold embroidery that glints across the waist and cuff, and a flowing pearl-ivory pleated skirt visible down to the original hem. At the neckline a small faceted deep sapphire oval brooch with a gold setting, readable in a thumbnail. Fashion illustration with radiant yet refined ceremony and no real or fictional visible brand symbols.
 
 </details>
 
